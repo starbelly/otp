@@ -90,7 +90,7 @@ static char erts_system_version[] = ("Erlang/OTP " ERLANG_OTP_RELEASE
 #else
 				     " [source]"
 #endif
-#endif	
+#endif
 #ifdef ARCH_64
 				     " [64-bit]"
 #endif
@@ -102,15 +102,15 @@ static char erts_system_version[] = ("Erlang/OTP " ERLANG_OTP_RELEASE
 				     " [async-threads:%d]"
 #ifdef HIPE
 				     " [hipe]"
-#endif	
+#endif
 #ifdef ET_DEBUG
 #if ET_DEBUG
 				     " [type-assertions]"
 #endif
-#endif	
+#endif
 #ifdef DEBUG
 				     " [debug-compiled]"
-#endif	
+#endif
 #ifdef ERTS_ENABLE_LOCK_CHECK
 				     " [lock-checking]"
 #endif
@@ -122,7 +122,7 @@ static char erts_system_version[] = ("Erlang/OTP " ERLANG_OTP_RELEASE
 #endif
 #ifdef PURIFY
 				     " [purify-compiled]"
-#endif	
+#endif
 #ifdef VALGRIND
 				     " [valgrind-compiled]"
 #endif
@@ -173,7 +173,7 @@ bld_bin_list(Uint **hpp, Uint *szp, ErlOffHeap* oh)
 	    ProcBin* pb = (ProcBin*) ohh;
 	    Eterm val = erts_bld_uword(hpp, szp, (UWord) pb->val);
 	    Eterm orig_size = erts_bld_uint(hpp, szp, pb->val->orig_size);
-    
+
 	    if (szp)
 		*szp += 4+2;
 	    if (hpp) {
@@ -199,7 +199,7 @@ bld_magic_ref_bin_list(Uint **hpp, Uint *szp, ErlOffHeap* oh)
             ErtsMRefThing *mrtp = (ErtsMRefThing *) ohh;
 	    Eterm val = erts_bld_uword(hpp, szp, (UWord) mrtp->mb);
 	    Eterm orig_size = erts_bld_uint(hpp, szp, mrtp->mb->orig_size);
-    
+
 	    if (szp)
 		*szp += 4+2;
 	    if (hpp) {
@@ -238,7 +238,7 @@ static void do_calc_mon_size(ErtsMonitor *mon, void *vpsz)
     else
         *psz += is_immed(mon->other.item) ? 0 : NC_HEAP_SIZE(mon->other.item);
 
-    *psz += 9; /* CONS + 6-tuple */ 
+    *psz += 9; /* CONS + 6-tuple */
 }
 
 typedef struct {
@@ -321,7 +321,7 @@ static void do_make_one_mon_element(ErtsMonitor *mon, void * vpmlc)
     pmlc->hp += 2;
 }
 
-static Eterm 
+static Eterm
 make_monitor_list(Process *p, int tree, ErtsMonitor *root, Eterm tail)
 {
     DECL_AM(erl_monitor);
@@ -364,7 +364,7 @@ static void calc_lnk_size(ErtsLink *lnk, void *vpsz)
 
     *psz += sz;
     *psz += is_immed(lnk->other.item) ? 0 : size_object(lnk->other.item);
-    *psz += 7; /* CONS + 4-tuple */ 
+    *psz += 7; /* CONS + 4-tuple */
 }
 
 typedef struct {
@@ -413,7 +413,7 @@ static void make_one_lnk_element(ErtsLink *lnk, void * vpllc)
     pllc->hp += 2;
 }
 
-static Eterm 
+static Eterm
 make_link_list(Process *p, int tree, ErtsLink *root, Eterm tail)
 {
     DECL_AM(erl_link);
@@ -473,7 +473,7 @@ erts_print_system_version(fmtfn_t to, void *arg, Process *c_p)
 typedef struct {
     /* {Entity,Node} = {monitor.Name,monitor.Pid} for external by name
      * {Entity,Node} = {monitor.Pid,NIL} for external/external by pid
-     * {Entity,Node} = {monitor.Name,erlang:node()} for internal by name 
+     * {Entity,Node} = {monitor.Name,erlang:node()} for internal by name
      * {Entity,Node} = {monitor.resource,MON_NIF_TARGET}*/
     union {
 	Eterm term;
@@ -526,13 +526,13 @@ static void collect_one_link(ErtsLink *lnk, void *vmicp)
     micp->mi[micp->mi_i].entity.term = lnk->other.item;
     micp->sz += 2 + NC_HEAP_SIZE(lnk->other.item);
     micp->mi_i++;
-} 
+}
 
 static void collect_one_origin_monitor(ErtsMonitor *mon, void *vmicp)
 {
     if (erts_monitor_is_origin(mon)) {
         MonitorInfoCollection *micp = vmicp;
- 
+
         EXTEND_MONITOR_INFOS(micp);
 
         micp->mi[micp->mi_i].type = mon->type;
@@ -578,11 +578,11 @@ static void collect_one_origin_monitor(ErtsMonitor *mon, void *vmicp)
 static void collect_one_target_monitor(ErtsMonitor *mon, void *vmicp)
 {
     MonitorInfoCollection *micp = vmicp;
- 
+
     if (erts_monitor_is_target(mon)) {
 
         EXTEND_MONITOR_INFOS(micp);
-  
+
         micp->mi[micp->mi_i].type = mon->type;
         micp->mi[micp->mi_i].named = !!(mon->flags & ERTS_ML_FLG_NAME);
         switch (mon->type) {
@@ -1349,7 +1349,7 @@ process_info_aux(Process *c_p,
      *    {registered_name, []} will appear in the resulting list.
      *
      *    If ERTS_PI_FLAG_ALWAYS_WRAP is set, process_info_aux() always
-     *    wrap the result in a key two tuple. 
+     *    wrap the result in a key two tuple.
      */
 
     switch (item_ix) {
@@ -1489,7 +1489,7 @@ process_info_aux(Process *c_p,
             Uint sz = NC_HEAP_SIZE(item_src) + 2;
             ERTS_PI_UNRESERVE(reserve_size, sz);
             hp = erts_produce_heap(hfact, sz, reserve_size);
-	    item = STORE_NC(&hp, hfact->off_heap, item_src); 
+	    item = STORE_NC(&hp, hfact->off_heap, item_src);
 	    res = CONS(hp, item, res);
 	}
 
@@ -1512,7 +1512,7 @@ process_info_aux(Process *c_p,
 	res = NIL;
 	for (i = 0; i < mic.mi_i; i++) {
 	    if (mic.mi[i].named) {
-		/* Monitor by name. 
+		/* Monitor by name.
                  * Build {process|port, {Name, Node}} and cons it.
 		 */
 		Eterm t1, t2;
@@ -2594,7 +2594,7 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
 	DistEntry *dep;
 	i = 0;
         erts_rwmtx_rlock(&erts_dist_table_rwmtx);
-	for (dep = erts_visible_dist_entries; dep; dep = dep->next) 
+	for (dep = erts_visible_dist_entries; dep; dep = dep->next)
 	    ++i;
 	for (dep = erts_hidden_dist_entries; dep; dep = dep->next)
 	    ++i;
@@ -2631,7 +2631,7 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
 			       ERLANG_ARCHITECTURE,
 			       sizeof(ERLANG_ARCHITECTURE)-1,
 			       NIL));
-    } 
+    }
     else if (BIF_ARG_1 == am_os_type) {
 	BIF_RET(os_type_tuple);
     }
@@ -2641,7 +2641,7 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
     else if (BIF_ARG_1 == am_thread_pool_size) {
 	extern int erts_async_max_threads;
 	int n;
-	
+
 	n = erts_async_max_threads;
 	BIF_RET(make_small(n));
     }
@@ -2793,8 +2793,8 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
 	return make_small(erts_this_node->creation);
     } else if (BIF_ARG_1 == am_break_ignored) {
       extern int ignore_break;
-      if (ignore_break) 
-	return am_true; 
+      if (ignore_break)
+	return am_true;
       else
 	return am_false;
     }
@@ -2832,6 +2832,10 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
 	int n = sizeof(ERLANG_OTP_RELEASE)-1;
 	hp = HAlloc(BIF_P, 2*n);
 	BIF_RET(buf_to_intlist(&hp, ERLANG_OTP_RELEASE, n, NIL));
+    } else if (ERTS_IS_ATOM_STR("otp_minor_version", BIF_ARG_1)) {
+	int n = sizeof(ERLANG_OTP_MINOR_VERSION)-1;
+	hp = HAlloc(BIF_P, 2*n);
+	BIF_RET(buf_to_intlist(&hp, ERLANG_OTP_MINOR_VERSION, n, NIL));
     } else if (ERTS_IS_ATOM_STR("driver_version", BIF_ARG_1)) {
 	char buf[42];
 	int n = erts_snprintf(buf, 42, "%d.%d",
@@ -2969,7 +2973,7 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
 	BIF_RET(am_true);
 #else
 	BIF_RET(am_false);
-#endif    
+#endif
     } else if (ERTS_IS_ATOM_STR("lock_checking", BIF_ARG_1)) {
 #ifdef ERTS_ENABLE_LOCK_CHECK
 	BIF_RET(am_true);
@@ -3054,13 +3058,13 @@ BIF_RETTYPE system_info_1(BIF_ALIST_1)
 #else
 	BIF_RET(am_none);
 #endif
-    }	    
+    }
     else if (ERTS_IS_ATOM_STR("dynamic_trace_probes", BIF_ARG_1)) {
 #if defined(USE_VM_PROBES)
 	BIF_RET(am_true);
 #else
 	BIF_RET(am_false);
-#endif	
+#endif
     }
     else if (ERTS_IS_ATOM_STR("thread_progress", BIF_ARG_1)) {
 	erts_thr_progress_dbg_print_state();
@@ -3154,7 +3158,7 @@ static void link_size(ErtsMonitor *lnk, void *vsz)
     *((Uint *) vsz) = erts_link_size(lnk);
 }
 
-/**********************************************************************/ 
+/**********************************************************************/
 /* Return information on ports */
 /* Info:
 **    id          Port index
@@ -3354,7 +3358,7 @@ erts_bld_port_info(Eterm **hpp, ErlOffHeap *ohp, Uint *szp, Port *prt,
 
 	/* All memory allocated by the driver should be included, but it is
 	   hard to retrieve... */
-	
+
 	res = erts_bld_uint(hpp, szp, size);
 	if (szp) {
 	    res = am_true;
@@ -3572,7 +3576,7 @@ BIF_RETTYPE erts_internal_is_process_alive_2(BIF_ALIST_2)
     BIF_RET(am_ok);
 }
 
-BIF_RETTYPE is_process_alive_1(BIF_ALIST_1) 
+BIF_RETTYPE is_process_alive_1(BIF_ALIST_1)
 {
     if (is_internal_pid(BIF_ARG_1)) {
         erts_aint32_t state;
@@ -3749,7 +3753,7 @@ BIF_RETTYPE statistics_1(BIF_ALIST_1)
 	hp = HAlloc(BIF_P, hsz);
 	b1 = erts_bld_uint(&hp, NULL, reds);
 	b2 = erts_bld_uint(&hp, NULL, diff);
-	res = TUPLE2(hp, b1, b2); 
+	res = TUPLE2(hp, b1, b2);
 	BIF_RET(res);
     } else if (BIF_ARG_1 == am_exact_reductions) {
 	Uint reds;
@@ -3763,7 +3767,7 @@ BIF_RETTYPE statistics_1(BIF_ALIST_1)
 	hp = HAlloc(BIF_P, hsz);
 	b1 = erts_bld_uint(&hp, NULL, reds);
 	b2 = erts_bld_uint(&hp, NULL, diff);
-	res = TUPLE2(hp, b1, b2); 
+	res = TUPLE2(hp, b1, b2);
 	BIF_RET(res);
     } else if (BIF_ARG_1 == am_runtime) {
 	ErtsMonotonicTime u1, u2;
@@ -4062,7 +4066,7 @@ BIF_RETTYPE erts_debug_get_internal_state_1(BIF_ALIST_1)
 			ERTS_ASSERT_IS_NOT_EXITING(BIF_P);
 			BIF_RET(am_undefined);
 		    }
-                    
+
                     local_only = 0;
                     do {
                         int reds = CONTEXT_REDS;
@@ -4127,7 +4131,7 @@ BIF_RETTYPE erts_debug_get_internal_state_1(BIF_ALIST_1)
 			ERTS_ASSERT_IS_NOT_EXITING(BIF_P);
 			BIF_RET(am_undefined);
 		    }
-                    
+
                     local_only = 0;
                     do {
                         int reds = CONTEXT_REDS;
@@ -4421,7 +4425,7 @@ BIF_RETTYPE erts_debug_set_internal_state_2(BIF_ALIST_2)
     }
 
     if (is_atom(BIF_ARG_1)) {
-	
+
 	if (ERTS_IS_ATOM_STR("reds_left", BIF_ARG_1)) {
 	    Sint reds;
 	    if (term_to_Sint(BIF_ARG_2, &reds) != 0) {
@@ -4500,7 +4504,7 @@ BIF_RETTYPE erts_debug_set_internal_state_2(BIF_ALIST_2)
 	    case am_false: enable = 0; break;
 	    default: BIF_ERROR(BIF_P, BADARG); break;
 	    }
- 
+
             res = (BIF_P->flags & F_DISABLE_GC) ? am_false : am_true;
 	    erts_set_gc_state(BIF_P, enable);
 	    BIF_RET(res);
@@ -4510,7 +4514,7 @@ BIF_RETTYPE erts_debug_set_internal_state_2(BIF_ALIST_2)
 	    if (is_tuple(BIF_ARG_2)) {
                 Eterm* tpl = tuple_val(BIF_ARG_2);
                 Uint cnt;
-                if (arityval(tpl[0]) == 2 && is_atom(tpl[1]) && 
+                if (arityval(tpl[0]) == 2 && is_atom(tpl[1]) &&
                     term_to_Uint(tpl[2], &cnt)) {
                     BIF_RET(erts_ets_colliding_names(BIF_P,tpl[1],cnt));
                 }
@@ -4894,7 +4898,7 @@ static Eterm lcnt_build_lock_term(Eterm **hpp, Uint *szp, lcnt_sample_t *sample,
     /* term: [{name, id, type, stats()}] */
 
     ASSERT(info->name);
-    
+
     lock_desc = erts_lock_flags_get_type_name(info->flags);
 
     type  = erts_atom_put((byte*)lock_desc, sys_strlen(lock_desc), ERTS_ATOM_ENC_LATIN1, 1);
@@ -4929,14 +4933,14 @@ static Eterm lcnt_build_result_term(Eterm **hpp, Uint *szp, erts_lcnt_time_t *du
 
     /* term: [{'duration', {seconds, nanoseconds}}, {'locks', locks()}] */
 
-    /* duration tuple */ 
+    /* duration tuple */
     dts  = bld_unstable_uint64(hpp, szp, duration->s);
     dtns = bld_unstable_uint64(hpp, szp, duration->ns);
     tdt  = erts_bld_tuple(hpp, szp, 2, dts, dtns);
 
     adur = erts_atom_put((byte *)str_duration, sys_strlen(str_duration), ERTS_ATOM_ENC_LATIN1, 1);
     tdur = erts_bld_tuple(hpp, szp, 2, adur, tdt);
-   
+
     /* lock tuple */
     aloc = erts_atom_put((byte *)str_locks, sys_strlen(str_locks), ERTS_ATOM_ENC_LATIN1, 1);
 

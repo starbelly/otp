@@ -18,7 +18,7 @@
 %% %CopyrightEnd%
 
 -module(epp_SUITE).
--export([all/0, suite/0,groups/0,init_per_suite/1, end_per_suite/1, 
+-export([all/0, suite/0,groups/0,init_per_suite/1, end_per_suite/1,
 	 init_per_group/2,end_per_group/2]).
 
 -export([rec_1/1, include_local/1, predef_mac/1,
@@ -63,7 +63,7 @@ suite() ->
     [{ct_hooks,[ts_install_cth]},
      {timetrap,{minutes,1}}].
 
-all() -> 
+all() ->
     [rec_1, {group, upcase_mac}, include_local, predef_mac,
      {group, variable}, otp_4870, otp_4871, otp_5362, pmod,
      not_circular, skip_header, otp_6277, otp_7702, otp_8130,
@@ -72,7 +72,7 @@ all() ->
      encoding, extends, function_macro, test_error, test_warning,
      otp_14285, test_if, source_name].
 
-groups() -> 
+groups() ->
     [{upcase_mac, [], [upcase_mac_1, upcase_mac_2]},
      {variable, [], [variable_1]}].
 
@@ -1234,7 +1234,16 @@ test_if(Config) ->
 	     "-else.\n"
 	     "t() -> ok.\n"
 	     "-endif.\n">>,
-	   ok}
+	   ok},
+
+    {if_9,
+	   <<"-if(?OTP_MINOR_RELEASE == 0).\n"
+	     "t() -> ok.\n"
+	     "-else.\n"
+	     "a bug.\n"
+	     "-endif.\n">>,
+           ok},
+
 	 ],
     [] = run(Config, Ts),
 
