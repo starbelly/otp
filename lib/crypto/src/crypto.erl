@@ -24,7 +24,7 @@
 
 -export([start/0, stop/0, info_lib/0, info_fips/0, supports/0, enable_fips_mode/1,
          version/0, bytes_to_integer/1]).
--export([equal_const_time/2]).
+-export([equal_const_time/2, old_equal_const_time/2]).
 -export([cipher_info/1, hash_info/1]).
 -export([hash/2, hash_init/1, hash_update/2, hash_final/1]).
 -export([sign/4, sign/5, verify/5, verify/6]).
@@ -780,19 +780,30 @@ equal_const_time(X1, X2) when is_binary(X1) andalso is_binary(X2) ->
     do_equal_const_time(X1, X2);
 
 equal_const_time(X1, X2) ->
-    equal_const_time(X1, X2, true).
-
-equal_const_time([H1|T1], [H2|T2], Truth) ->
-    equal_const_time(T1, T2, Truth and (H1 == H2));
-equal_const_time([_|T1], [], Truth) ->
-    equal_const_time(T1, [], Truth and false);
-equal_const_time([], [], Truth) ->
-    Truth;
-
-equal_const_time(_, _, _) ->
-    false.
+    do_equal_const_time(list_to_binary(X1), list_to_binary(X2)).
 
 do_equal_const_time(_X1, _X2) -> ?nif_stub.
+
+old_equal_const_time(X1, X2) ->
+    old_equal_const_time(X1, X2, true).
+
+
+old_equal_const_time(<<B1,R1/binary>>, <<B2,R2/binary>>, Truth) ->
+    old_equal_const_time(R1, R2, Truth and (B1 == B2));
+old_equal_const_time(<<_,R1/binary>>, <<>>, Truth) ->
+    old_equal_const_time(R1, <<>>, Truth and false);
+old_equal_const_time(<<>>, <<>>, Truth) ->
+    Truth;
+
+old_equal_const_time([H1|T1], [H2|T2], Truth) ->
+    old_equal_const_time(T1, T2, Truth and (H1 == H2));
+old_equal_const_time([_|T1], [], Truth) ->
+    old_equal_const_time(T1, [], Truth and false);
+old_equal_const_time([], [], Truth) ->
+    Truth;
+
+old_equal_const_time(_, _, _) ->
+    false.
 
 %%%================================================================
 %%%
