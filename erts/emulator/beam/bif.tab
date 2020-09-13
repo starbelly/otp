@@ -568,6 +568,7 @@ bif binary:encode_unsigned/1
 bif binary:encode_unsigned/2
 bif binary:decode_unsigned/1
 bif binary:decode_unsigned/2
+bif binary:secure_compare/2
 
 bif erlang:nif_error/1
 bif erlang:nif_error/2
