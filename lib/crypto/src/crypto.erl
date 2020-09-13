@@ -24,7 +24,7 @@
 
 -export([start/0, stop/0, info_lib/0, info_fips/0, supports/0, enable_fips_mode/1,
          version/0, bytes_to_integer/1]).
--export([equal_const_time/2, old_equal_const_time/2]).
+-export([equal_const_time/2, old_equal_const_time/2, secure_compare/2]).
 -export([cipher_info/1, hash_info/1]).
 -export([hash/2, hash_init/1, hash_update/2, hash_final/1]).
 -export([sign/4, sign/5, verify/5, verify/6]).
@@ -804,6 +804,26 @@ old_equal_const_time([], [], Truth) ->
 
 old_equal_const_time(_, _, _) ->
     false.
+
+secure_compare(L, R)
+    when
+        is_binary(L)
+        andalso
+        is_binary(R) ->
+    case byte_size(L) == byte_size(R) of
+        false ->
+            false;
+        true ->
+            secure_compare(L, R, 0)
+    end.
+
+secure_compare(<<X1/integer,L1/binary>>,
+               <<Y1/integer,R1/binary>>,
+               Acc) ->
+    Xorred = X1 bxor Y1,
+    secure_compare(L1, R1, Acc bor Xorred);
+secure_compare(<<>>, <<>>, Acc) ->
+    Acc =:= 0.
 
 %%%================================================================
 %%%
