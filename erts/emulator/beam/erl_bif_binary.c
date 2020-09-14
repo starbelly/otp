@@ -2459,7 +2459,7 @@ static int cleanup_copy_bin_state(Binary *bp)
     return 1;
 }
 
-static BIF_RETTYPE do_secure_compare(Process *p, Eterm bin1, Eterm bin2)
+static BIF_RETTYPE secure_compare(Process *p, Eterm bin1, Eterm bin2)
 {
     byte *bytes1;
     byte *bytes2;
@@ -2502,7 +2502,7 @@ static BIF_RETTYPE do_secure_compare(Process *p, Eterm bin1, Eterm bin2)
 
 BIF_RETTYPE secure_compare_2(BIF_ALIST_2)
 {
-    return do_secure_compare(BIF_P, BIF_ARG_1, BIF_ARG_2);
+    return secure_compare(BIF_P, BIF_ARG_1, BIF_ARG_2);
 }
 
 /*
