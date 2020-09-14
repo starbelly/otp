@@ -70,7 +70,7 @@ binary_match(Process *p, Eterm arg1, Eterm arg2, Eterm arg3, Uint flags);
 static BIF_RETTYPE
 binary_split(Process *p, Eterm arg1, Eterm arg2, Eterm arg3);
 
-static BIF_RETTYPE secure_compare(Process *p, Eterm bin1, Eterm bin2);
+static BIF_RETTYPE binary_secure_compare(Process *p, Eterm bin1, Eterm bin2);
 
 void erts_init_bif_binary(void)
 {
@@ -2459,7 +2459,7 @@ static int cleanup_copy_bin_state(Binary *bp)
     return 1;
 }
 
-static BIF_RETTYPE secure_compare(Process *p, Eterm bin1, Eterm bin2)
+static BIF_RETTYPE binary_secure_compare(Process *p, Eterm bin1, Eterm bin2)
 {
     byte *bytes1;
     byte *bytes2;
@@ -2470,9 +2470,7 @@ static BIF_RETTYPE secure_compare(Process *p, Eterm bin1, Eterm bin2)
     size_t i;
     volatile unsigned char acc = 0;
     
-    if (!is_not_binary(bin1))
-        goto bad_arg;
-    if (!is_not_binary(bin2))
+    if (is_not_binary(bin1) || is_not_binary(bin2))
         goto bad_arg;
     
     ERTS_GET_BINARY_BYTES(bin1, bytes1, bitoffs1, bitsize1); 
@@ -2500,9 +2498,9 @@ static BIF_RETTYPE secure_compare(Process *p, Eterm bin1, Eterm bin2)
     BIF_ERROR(p,BADARG);
 }
 
-BIF_RETTYPE secure_compare_2(BIF_ALIST_2)
+BIF_RETTYPE binary_secure_compare_2(BIF_ALIST_2)
 {
-    return secure_compare(BIF_P, BIF_ARG_1, BIF_ARG_2);
+    return binary_secure_compare(BIF_P, BIF_ARG_1, BIF_ARG_2);
 }
 
 /*
