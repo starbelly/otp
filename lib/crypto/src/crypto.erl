@@ -805,8 +805,7 @@ old_equal_const_time([], [], Truth) ->
 old_equal_const_time(_, _, _) ->
     false.
 
-secure_compare(L, R)
-    when is_binary(L) andalso is_binary(R) ->
+secure_compare(L, R) ->
     case byte_size(L) == byte_size(R) of
         false ->
             false;
