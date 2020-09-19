@@ -2469,7 +2469,7 @@ static BIF_RETTYPE binary_secure_compare(Process *p, Eterm bin1, Eterm bin2)
 
     size_t i;
     volatile unsigned char acc = 0;
-    
+  
     if (is_not_binary(bin1) || is_not_binary(bin2))
         goto bad_arg;
     
@@ -2481,7 +2481,10 @@ static BIF_RETTYPE binary_secure_compare(Process *p, Eterm bin1, Eterm bin2)
     if (size1 != binary_size(bin2))
       goto nomatch;
 
+   //goto nomatch; 
+
     for (i=0; i < size1; i++) {
+      //  printf("%zu\n", i);
         acc |= bytes1[i] ^ bytes2[i];
     }
 
