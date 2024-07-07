@@ -19,7 +19,7 @@
 %%=======================================================================
 %% Notes:
 %%   1. It does NOT work for .beam files of previous BEAM versions.
-%%   2. If handling of new BEAM instructions is needed, this should be 
+%%   2. If handling of new BEAM instructions is needed, this should be
 %%      inserted at the end of function resolve_inst().
 %%=======================================================================
 
@@ -135,7 +135,7 @@ pp(Stream, Disasm) when is_pid(Stream), is_list(Disasm) ->
 		fun (#function{name=F,arity=A,entry=E,code=C}) ->
 			io:format(Stream, "~p.~n", [{function,F,A,E}]),
 			lists:foreach(
-			  fun (I) -> 
+			  fun (I) ->
 				  io:put_chars(Stream, [pp_instr(I)|NL])
 			  end, C),
 			io:nl(Stream)
@@ -202,7 +202,7 @@ process_chunks(F) ->
 		    none -> [];
 		    Atts when is_list(Atts) -> Atts
 		end,
-	    CompInfo = 
+	    CompInfo =
 		case optional_chunk(F, "CInf") of
 		    none -> [];
 		    CompInfoBin when is_binary(CompInfoBin) ->
@@ -614,13 +614,13 @@ decode_int_length(B, Bs) ->
 	    case Arg of
 		{u,L} ->
 		    {L+9,ArgBs};  % 9 stands for 7+2
-		_ -> 
+		_ ->
 		    ?exit({decode_int,weird_bignum_sublength,Arg})
 	    end;
 	L ->
 	    {L+2,Bs}
     end.
-    
+
 -spec decode_negative(non_neg_integer(), non_neg_integer()) -> neg_integer().
 
 decode_negative(N, Len) ->
@@ -756,7 +756,7 @@ decode_tag(?tag_z) -> z.
 %%    (note: string table should be passed as a BINARY so that we can
 %%    use binary_to_list/3!)
 %% - convert instruction to its readable form ...
-%% 
+%%
 %% Currently, only the first three are done (systematically, at least).
 %%
 %% Note: It MAY be premature to remove the lists of args, since that
@@ -804,7 +804,7 @@ resolve_inst(Instr, Imports, Str, Lbls, _Lambdas, _Literals, _M) ->
 
 resolve_inst({label,[{u,L}]},_,_,_) ->
     {label,L};
-resolve_inst(FuncInfo,_,_,_) when element(1, FuncInfo) =:= func_info -> 
+resolve_inst(FuncInfo,_,_,_) when element(1, FuncInfo) =:= func_info ->
     FuncInfo; % already resolved
 %% resolve_inst(int_code_end,_,_,_,_) ->  % instruction already handled
 %%    int_code_end;                       % should not really be handled here
@@ -959,6 +959,9 @@ resolve_inst({call_fun,[{u,N}]},_,_,_) ->
 resolve_inst({is_function=I,Args0},_,_,_) ->
     [L|Args] = resolve_args(Args0),
     {test,I,L,Args};
+resolve_inst({is_function_export=I,Args0},_,_,_) ->
+    [L|Args] = resolve_args(Args0),
+    {test,I,L,Args};
 resolve_inst({call_ext_only,[{u,N},{u,MFAix}]},Imports,_,_) ->
     {call_ext_only,N,lookup(MFAix+1,Imports)};
 %%
@@ -1106,7 +1109,7 @@ resolve_inst({gc_bif3,Args},Imports,_,_) ->
 
 %%
 %% R11B-5.
-%% 
+%%
 resolve_inst({is_bitstr=I,Args0},_,_,_) ->
     [L|Args] = resolve_args(Args0),
     {test,I,L,Args};
@@ -1122,7 +1125,7 @@ resolve_inst({bs_test_unit=I,[F,Ms,{u,N}]},_,_,_) ->
 resolve_inst({bs_match_string=I,[F,Ms,{u,Bits},{u,Off}]},_,Strings,_) ->
     Len = (Bits+7) div 8,
     String = if
-		 Len > 0 -> 
+		 Len > 0 ->
 		     <<_:Off/binary,Bin:Len/binary,_/binary>> = Strings,
 		     Bin;
 		 true -> <<>>

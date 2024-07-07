@@ -29,26 +29,26 @@ of interest to programmers who manipulate Erlang code.
 %%
 %% NOTE: All guard_bif(), arith_op(), bool_op() and comp_op() must be
 %%       defined in bif.tab as 'ubif', i.e bif without trace wrapper.
-%%       
+%%
 %%       Why?
-%%       
+%%
 %%       Because the compiler uses an optimized instruction for
-%%       the call to these bifs, which when loaded gets a direct 
-%%       entry pointer inserted into itself by the loader, 
+%%       the call to these bifs, which when loaded gets a direct
+%%       entry pointer inserted into itself by the loader,
 %%       instead of a bif table index as for regular bifs.
-%%       
-%%       If tracing is enabled on these bifs, when a module is loaded, 
-%%       the direct entry pointer inserted into the call instruction 
-%%       will be pointing to the trace wrapper, so even if tracing is 
-%%       disabled for bifs, the loaded module will call these bifs through 
+%%
+%%       If tracing is enabled on these bifs, when a module is loaded,
+%%       the direct entry pointer inserted into the call instruction
+%%       will be pointing to the trace wrapper, so even if tracing is
+%%       disabled for bifs, the loaded module will call these bifs through
 %%       the trace wrappers.
-%%       
+%%
 %%       The call instruction in question does not give enough information
-%%       to call trace match function {caller} for it to succeed 
+%%       to call trace match function {caller} for it to succeed
 %%       other then by chance, and the 'return_to' trace flag works just
-%%       as bad, so both will mostly say that the caller is 'undefined'. 
+%%       as bad, so both will mostly say that the caller is 'undefined'.
 %%       Furthermore the calls to these bifs will still generate
-%%       trace messages from the loaded module even if tracing is disabled 
+%%       trace messages from the loaded module even if tracing is disabled
 %%       for them, and no one knows what else might be messed up.
 %%
 %%       That's why!
@@ -121,6 +121,7 @@ new_type_test(is_boolean, 1) -> true;
 new_type_test(is_float, 1) -> true;
 new_type_test(is_function, 1) -> true;
 new_type_test(is_function, 2) -> true;
+new_type_test(is_function_export, 1) -> true;
 new_type_test(is_integer, 1) -> true;
 new_type_test(is_list, 1) -> true;
 new_type_test(is_map, 1) -> true;
@@ -347,6 +348,7 @@ bif(is_bitstring, 1) -> true;
 bif(is_float, 1) -> true;
 bif(is_function, 1) -> true;
 bif(is_function, 2) -> true;
+bif(is_function_export, 1) -> true;
 bif(is_integer, 1) -> true;
 bif(is_list, 1) -> true;
 bif(is_map, 1) -> true;
@@ -503,6 +505,7 @@ old_bif(is_bitstring, 1) -> true;
 old_bif(is_float, 1) -> true;
 old_bif(is_function, 1) -> true;
 old_bif(is_function, 2) -> true;
+old_bif(is_function_export, 1) -> true;
 old_bif(is_integer, 1) -> true;
 old_bif(is_list, 1) -> true;
 old_bif(is_number, 1) -> true;

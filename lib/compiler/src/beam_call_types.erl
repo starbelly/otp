@@ -133,6 +133,8 @@ will_succeed(erlang, is_function, [_, Arity]=Args) ->
         _ ->
             no
     end;
+will_succeed(erlang, is_function_export, [Arg]) ->
+    succeeds_if_type(Arg, #t_fun{});
 will_succeed(erlang, is_map_key, [_Key, Map]) ->
     succeeds_if_type(Map, #t_map{});
 will_succeed(erlang, length, [Arg]) ->
@@ -391,6 +393,8 @@ types(erlang, is_function, [Type, ArityType]) ->
               end,
     sub_unsafe(RetType, [any, any]);
 types(erlang, is_function, [Type]) ->
+    sub_unsafe_type_test(Type, #t_fun{});
+types(erlang, is_function_export, [Type]) ->
     sub_unsafe_type_test(Type, #t_fun{});
 types(erlang, is_integer, [Type]) ->
     sub_unsafe_type_test(Type, #t_integer{});

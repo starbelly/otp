@@ -1326,6 +1326,20 @@ void BeamModuleAssembler::emit_is_function2(const ArgLabel &Fail,
     });
 }
 
+
+void BeamModuleAssembler::emit_is_function_export(const ArgLabel &Fail,
+                                           const ArgRegister &Src) {
+    // TODO : Fill me in, yanked this from is_function to get past compile
+    mov_arg(RET, Src);
+    emit_is_boxed(resolve_beam_label(Fail), Src, RET);
+    x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
+    preserve_cache([&]() {
+        a.cmp(emit_boxed_val(boxed_ptr, 0, sizeof(byte)), imm(MAKE_FUN_HEADER(0, 0, 0) & 0xFFF));
+        a.jne(resolve_beam_label(Fail));
+    });
+}
+
+
 void BeamModuleAssembler::emit_is_integer(const ArgLabel &Fail,
                                           const ArgSource &Src) {
     if (always_immediate(Src)) {

@@ -55,6 +55,7 @@ pred.never_fails(Bif) {
 	 am_is_port,
 	 am_is_reference,
 	 am_is_tuple,
+         am_is_function_export,
 	};
 
     Uint index = Bif.val;

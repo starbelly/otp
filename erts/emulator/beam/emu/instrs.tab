@@ -958,6 +958,12 @@ is_function(Fail, Src) {
     }
 }
 
+is_function_export(Fail, Fun) {
+   if (erl_is_function_export($Fun) != am_true) {
+       $FAIL($Fail);
+   }
+}
+
 cold_is_function2(Fail, Fun, Arity) {
     if (erl_is_function(c_p, $Fun, $Arity) != am_true ) {
         $FAIL($Fail);

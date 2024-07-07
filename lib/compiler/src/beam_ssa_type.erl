@@ -2797,6 +2797,9 @@ infer_type({bif,is_function}, [#b_var{}=Arg, Arity], _Ts, _Ds) ->
             T = {Arg, #t_fun{}},
             {[T], []}
     end;
+infer_type({bif,is_function_export}, [#b_var{}=Arg], _Ts, _Ds) ->
+    T = {Arg, #t_fun{}},
+    {[T], [T]};
 infer_type({bif,is_integer}, [#b_var{}=Arg], _Ts, _Ds) ->
     T = {Arg, #t_integer{}},
     {[T], [T]};

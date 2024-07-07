@@ -134,7 +134,7 @@ BIF_RETTYPE is_atom_1(BIF_ALIST_1)
     }
     BIF_RET(am_false);
 }
-	
+
 BIF_RETTYPE is_float_1(BIF_ALIST_1)
 {
     if (is_float(BIF_ARG_1)) {
@@ -237,7 +237,7 @@ Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
 
     /*
      * Verify argument 2 (arity); arity must be >= 0.
-     */ 
+     */
     if (is_small(arg2)) {
 	arity = signed_val(arg2);
 	if (arity < 0) {
@@ -263,6 +263,28 @@ Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
     BIF_RET(am_false);
 }
 
+Eterm erl_is_function_export(Eterm arg1)
+{
+
+
+    if (is_any_fun(arg1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+        if (is_external_fun(funp)) {
+	       BIF_RET(am_true);
+        }
+    }
+
+     BIF_RET(am_false);
+}
+
+BIF_RETTYPE is_function_export_1(BIF_ALIST_1)
+{
+
+     BIF_RET(erl_is_function_export(BIF_ARG_1));
+
+}
+
+
 BIF_RETTYPE is_boolean_1(BIF_ALIST_1)
 {
     if (BIF_ARG_1 == am_true || BIF_ARG_1 == am_false) {
@@ -280,7 +302,7 @@ BIF_RETTYPE is_boolean_1(BIF_ALIST_1)
  * a weak version of is_record/2 as BIF (the size of the record cannot
  * be verified).
  */
-BIF_RETTYPE is_record_2(BIF_ALIST_2) 
+BIF_RETTYPE is_record_2(BIF_ALIST_2)
 {
     Eterm *t;
 
@@ -299,26 +321,26 @@ BIF_RETTYPE is_record_2(BIF_ALIST_2)
 
 /*
  * Record test cannot actually be a bif. The epp processor is involved in
- * the real guard test, we have to add one more parameter, the 
+ * the real guard test, we have to add one more parameter, the
  * return value of record_info(size, Rec), which is the arity of the TUPLE.
  * his may seem awkward when applied from the shell, where the plain
  * tuple test is more understandable, I think...
  */
-BIF_RETTYPE is_record_3(BIF_ALIST_3) 
+BIF_RETTYPE is_record_3(BIF_ALIST_3)
 {
     Eterm *t;
     if (is_not_atom(BIF_ARG_2) || is_not_small(BIF_ARG_3)) {
 	BIF_ERROR(BIF_P, BADARG);
     }
 
-    if (is_tuple(BIF_ARG_1) && 
+    if (is_tuple(BIF_ARG_1) &&
 	arityval(*(t = tuple_val(BIF_ARG_1))) == signed_val(BIF_ARG_3)
 	&& t[1] == BIF_ARG_2) {
  	BIF_RET(am_true);
     }
     BIF_RET(am_false);
 }
-	
+
 BIF_RETTYPE is_map_1(BIF_ALIST_1)
 {
     if (is_map(BIF_ARG_1)) {

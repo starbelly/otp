@@ -87,7 +87,7 @@ format_error(Error) ->
 
 %%%
 %%% Local functions follow.
-%%% 
+%%%
 
 %%%
 %%% The validator follows.
@@ -1261,7 +1261,7 @@ init_try_catch_branch(Kind, Dst, Fail, Vst0) ->
     #vst{current=St0} = Vst,
     #st{ct=Tags}=St0,
     St = St0#st{ct=[Tag|Tags]},
- 
+
     Vst#vst{current=St}.
 
 verify_has_map_fields(Lbl, Src, List, Vst) ->
@@ -2265,6 +2265,8 @@ infer_types_1(#value{op={bif,is_function},args=[Src,_Arity]}, Val, Op, Vst) ->
     end;
 infer_types_1(#value{op={bif,is_function},args=[Src]}, Val, Op, Vst) ->
     infer_type_test_bif(#t_fun{}, Src, Val, Op, Vst);
+infer_types_1(#value{op={bif,is_function_export},args=[Src]}, Val, Op, Vst) ->
+    infer_type_test_bif(#t_fun{}, Src, Val, Op, Vst);
 infer_types_1(#value{op={bif,is_integer},args=[Src]}, Val, Op, Vst) ->
     infer_type_test_bif(#t_integer{}, Src, Val, Op, Vst);
 infer_types_1(#value{op={bif,is_list},args=[Src]}, Val, Op, Vst) ->
@@ -2798,15 +2800,15 @@ get_raw_type(#value_ref{}=Ref, #vst{current=#st{vs=Vs}}) ->
 get_raw_type(Src, #vst{current=#st{}}) ->
     get_literal_type(Src).
 
-get_literal_type(nil) -> 
+get_literal_type(nil) ->
     beam_types:make_type_from_value([]);
-get_literal_type({atom,A}) when is_atom(A) -> 
+get_literal_type({atom,A}) when is_atom(A) ->
     beam_types:make_type_from_value(A);
-get_literal_type({float,F}) when is_float(F) -> 
+get_literal_type({float,F}) when is_float(F) ->
     beam_types:make_type_from_value(F);
-get_literal_type({integer,I}) when is_integer(I) -> 
+get_literal_type({integer,I}) when is_integer(I) ->
     beam_types:make_type_from_value(I);
-get_literal_type({literal,L}) -> 
+get_literal_type({literal,L}) ->
     beam_types:make_type_from_value(L);
 get_literal_type(T) ->
     error({not_literal,T}).

@@ -883,6 +883,10 @@ i_lambda_error t
 is_function f S
 is_function Fail=f c => jump Fail
 
+%hot
+is_function_export f S
+is_function_export Fail=f c => jump Fail
+
 # The start and end of a function.
 int_func_start/5
 int_func_end/2
