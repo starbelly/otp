@@ -1328,17 +1328,20 @@ void BeamModuleAssembler::emit_is_function2(const ArgLabel &Fail,
 
 
 void BeamModuleAssembler::emit_is_function_export(const ArgLabel &Fail,
-                                           const ArgRegister &Src) {
-    // TODO : Fill me in, yanked this from is_function to get past compile
+                                                  const ArgRegister &Src) {
     mov_arg(RET, Src);
-    emit_is_boxed(resolve_beam_label(Fail), Src, RET);
-    x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
-    preserve_cache([&]() {
-        a.cmp(emit_boxed_val(boxed_ptr, 0, sizeof(byte)), imm(MAKE_FUN_HEADER(0, 0, 0) & 0xFFF));
-        a.jne(resolve_beam_label(Fail));
-    });
-}
 
+    emit_is_boxed(resolve_beam_label(Fail), Src, RET);
+
+    preserve_cache([&]() {
+        x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
+
+        a.mov(RETd, emit_boxed_val(boxed_ptr, 0, sizeof(Uint32)));
+        a.and_(RETd, imm(MAKE_FUN_HEADER(0, 0, 1) | _TAG_HEADER_MASK));
+        a.cmp(RETd, imm(MAKE_FUN_HEADER(0, 0, 1)));
+        a.jne(resolve_beam_label(Fail));
+    }, RET);
+}
 
 void BeamModuleAssembler::emit_is_integer(const ArgLabel &Fail,
                                           const ArgSource &Src) {
