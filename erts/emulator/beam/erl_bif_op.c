@@ -232,7 +232,7 @@ BIF_RETTYPE is_function_2(BIF_ALIST_2)
 }
 
 
-BIF_RETTYPE is_function_export_1(BIF_ALIST_1)
+BIF_RETTYPE is_mfa_1(BIF_ALIST_1)
 {
 
     if (is_any_fun(BIF_ARG_1)) {
@@ -245,10 +245,10 @@ BIF_RETTYPE is_function_export_1(BIF_ALIST_1)
     BIF_RET(am_false);
 }
 
-BIF_RETTYPE is_function_export_2(BIF_ALIST_2)
+BIF_RETTYPE is_mfa_2(BIF_ALIST_2)
 {
 
-    BIF_RET(erl_is_function_export(BIF_P, BIF_ARG_1, BIF_ARG_2));
+    BIF_RET(erl_is_mfa(BIF_P, BIF_ARG_1, BIF_ARG_2));
 }
 
 
@@ -285,7 +285,7 @@ Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
     BIF_RET(am_false);
 }
 
-Eterm erl_is_function_export(Process* p, Eterm arg1, Eterm arg2)
+Eterm erl_is_mfa(Process* p, Eterm arg1, Eterm arg2)
 {
 
     if (is_any_fun(arg1)) {

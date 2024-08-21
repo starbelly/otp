@@ -1327,7 +1327,7 @@ void BeamModuleAssembler::emit_is_function2(const ArgLabel &Fail,
 }
 
 
-void BeamModuleAssembler::emit_is_function_export(const ArgLabel &Fail,
+void BeamModuleAssembler::emit_is_mfa(const ArgLabel &Fail,
                                                   const ArgRegister &Src) {
     mov_arg(RET, Src);
 

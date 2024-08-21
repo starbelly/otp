@@ -1496,10 +1496,10 @@ bif_to_test_1(is_function, [_]=Ops, Fail) ->
     {test,is_function,Fail,Ops};
 bif_to_test_1(is_function, [_,_]=Ops, Fail) ->
     {test,is_function2,Fail,Ops};
-bif_to_test_1(is_function_export, [_,_]=Ops, Fail) ->
-    {test,is_function_export2,Fail,Ops};
-bif_to_test_1(is_function_export, [_]=Ops, Fail) ->
-    {test,is_function_export,Fail,Ops};
+bif_to_test_1(is_mfa, [_,_]=Ops, Fail) ->
+    {test,is_mfa2,Fail,Ops};
+bif_to_test_1(is_mfa, [_]=Ops, Fail) ->
+    {test,is_mfa,Fail,Ops};
 bif_to_test_1(is_integer,  [_]=Ops, Fail) ->
     {test,is_integer,Fail,Ops};
 bif_to_test_1(is_list,     [_]=Ops, Fail) ->

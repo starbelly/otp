@@ -67,8 +67,8 @@ pred.never_fails(Bif) {
 	    return 0;
 	}
 
-	if (entry->function == am_is_function || entry->function == am_is_function_export) {
-	    /* Note that is_function/2 and is_function_export/2 may fail. */
+	if (entry->function == am_is_function || entry->function == am_is_mfa) {
+	    /* Note that is_function/2 and is_mfa/2 may fail. */
 	    return entry->arity == 1;
 	}
 

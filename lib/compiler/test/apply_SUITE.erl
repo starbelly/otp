@@ -95,9 +95,9 @@ mfa(Config) when is_list(Config) ->
     true = ?APPLY2(Erlang, is_function, fun erlang:list_to_binary/1, 1),
     true = ?APPLY2(Erlang, is_function, fun() -> ok end, 0),
     false = ?APPLY2(Erlang, is_function, blurf, 0),
-    true = ?APPLY1(Erlang, is_function_export, fun erlang:list_to_binary/1),
-    false = ?APPLY1(Erlang, is_function_export, fun() -> ok end),
-    false = ?APPLY1(Erlang, is_function_export, eh),
+    true = ?APPLY1(Erlang, is_mfa, fun erlang:list_to_binary/1),
+    false = ?APPLY1(Erlang, is_mfa, fun() -> ok end),
+    false = ?APPLY1(Erlang, is_mfa, eh),
 
 
     apply(Mod, foo, []).

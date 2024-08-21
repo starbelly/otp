@@ -133,12 +133,12 @@ will_succeed(erlang, is_function, [_, Arity]=Args) ->
         _ ->
             no
     end;
-will_succeed(erlang, is_function_export, [_, Arity]=Args) ->
+will_succeed(erlang, is_mfa, [_, Arity]=Args) ->
     case meet(Arity, #t_integer{}) of
         #t_integer{elements={Min,_}}=Arity when is_integer(Min), Min >= 0 ->
             yes;
         #t_integer{} ->
-            fails_on_conflict(erlang, is_function_export, Args);
+            fails_on_conflict(erlang, is_mfa, Args);
         _ ->
             no
     end;
@@ -401,7 +401,7 @@ types(erlang, is_function, [Type, ArityType]) ->
     sub_unsafe(RetType, [any, any]);
 types(erlang, is_function, [Type]) ->
     sub_unsafe_type_test(Type, #t_fun{});
-types(erlang, is_function_export, [Type, ArityType]) ->
+types(erlang, is_mfa, [Type, ArityType]) ->
     RetType = case meet(ArityType, #t_integer{}) of
                   none ->
                       none;
@@ -426,7 +426,7 @@ types(erlang, is_function_export, [Type, ArityType]) ->
                       end
               end,
     sub_unsafe(RetType, [any, any]);
-types(erlang, is_function_export, [Type]) ->
+types(erlang, is_mfa, [Type]) ->
     sub_unsafe_type_test(Type, #t_fun{});
 types(erlang, is_integer, [Type]) ->
     sub_unsafe_type_test(Type, #t_integer{});

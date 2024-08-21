@@ -1291,7 +1291,7 @@ void BeamModuleAssembler::emit_is_function2(const ArgLabel &Fail,
     a.b_ne(resolve_beam_label(Fail, disp1MB));
 }
 
-void BeamModuleAssembler::emit_is_function_export(const ArgLabel &Fail,
+void BeamModuleAssembler::emit_is_mfa(const ArgLabel &Fail,
                                            const ArgRegister &Src) {
 
     auto src = load_source(Src, TMP1);
@@ -1304,7 +1304,7 @@ void BeamModuleAssembler::emit_is_function_export(const ArgLabel &Fail,
     a.b_ne(resolve_beam_label(Fail, disp1MB));
 }
 
-void BeamModuleAssembler::emit_is_function_export2(const ArgLabel &Fail,
+void BeamModuleAssembler::emit_is_mfa2(const ArgLabel &Fail,
                                             const ArgSource &Src,
                                             const ArgSource &Arity) {
     if (!Arity.isSmall()) {

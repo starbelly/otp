@@ -823,12 +823,12 @@ cold_is_function2 f? x x
 %hot
 hot_is_function2 f? S t
 
-is_function_export2 Fail=f Fun Arity => is_function_export2(Fail, Fun, Arity)
+is_mfa2 Fail=f Fun Arity => is_mfa2(Fail, Fun, Arity)
 
 %cold
-cold_is_function_export2 f? x x
+cold_is_mfa2 f? x x
 %hot
-hot_is_function_export2 f? S t
+hot_is_mfa2 f? S t
 
 # Allocating & i_initializing.
 allocate Need Regs | i_init Y => allocate_init Need Regs Y
@@ -1082,8 +1082,8 @@ i_lambda_error t
 is_function f? xy
 is_function Fail=f c => jump Fail
 
-is_function_export f? xy
-is_function_export Fail=f c => jump Fail
+is_mfa f? xy
+is_mfa Fail=f c => jump Fail
 
 func_info M F A => i_func_info u M F A
 
@@ -1608,4 +1608,3 @@ i_update_record_in_place t xy xy t s
 i_update_record_continue t s
 
 i_update_record_in_place_done
-
