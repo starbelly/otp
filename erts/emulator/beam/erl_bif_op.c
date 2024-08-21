@@ -231,6 +231,28 @@ BIF_RETTYPE is_function_2(BIF_ALIST_2)
     BIF_RET(erl_is_function(BIF_P, BIF_ARG_1, BIF_ARG_2));
 }
 
+
+BIF_RETTYPE is_function_export_1(BIF_ALIST_1)
+{
+
+    if (is_any_fun(BIF_ARG_1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(BIF_ARG_1);
+        if (is_external_fun(funp) ) {
+	       BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+BIF_RETTYPE is_function_export_2(BIF_ALIST_2)
+{
+
+    BIF_RET(erl_is_function_export(BIF_P, BIF_ARG_1, BIF_ARG_2));
+}
+
+
+
 Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
 {
     Sint arity;
@@ -263,27 +285,18 @@ Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
     BIF_RET(am_false);
 }
 
-Eterm erl_is_function_export(Eterm arg1)
+Eterm erl_is_function_export(Process* p, Eterm arg1, Eterm arg2)
 {
-
 
     if (is_any_fun(arg1)) {
         ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
         if (is_external_fun(funp)) {
-	       BIF_RET(am_true);
+            BIF_RET(erl_is_function(p, arg1, arg2));
         }
     }
 
-     BIF_RET(am_false);
+    BIF_RET(am_false);
 }
-
-BIF_RETTYPE is_function_export_1(BIF_ALIST_1)
-{
-
-     BIF_RET(erl_is_function_export(BIF_ARG_1));
-
-}
-
 
 BIF_RETTYPE is_boolean_1(BIF_ALIST_1)
 {

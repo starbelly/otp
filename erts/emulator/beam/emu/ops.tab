@@ -823,6 +823,13 @@ cold_is_function2 f? x x
 %hot
 hot_is_function2 f? S t
 
+is_function_export2 Fail=f Fun Arity => is_function_export2(Fail, Fun, Arity)
+
+%cold
+cold_is_function_export2 f? x x
+%hot
+hot_is_function_export2 f? S t
+
 # Allocating & i_initializing.
 allocate Need Regs | i_init Y => allocate_init Need Regs Y
 i_init Y1 | i_init Y2 => i_init2 Y1 Y2

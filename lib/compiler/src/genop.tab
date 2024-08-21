@@ -697,3 +697,5 @@ BEAM_FORMAT_NUMBER=0
 183: executable_line/2
 
 184: is_function_export/2
+
+185: is_function_export2/3

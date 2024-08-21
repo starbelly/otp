@@ -924,7 +924,7 @@ Eterm erts_trapping_length_1(Process* p, Eterm* args);
 
 Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2);
 
-Eterm erl_is_function_export(Eterm arg1);
+Eterm erl_is_function_export(Process* p, Eterm arg1, Eterm arg2);
 
 /* beam_bif_load.c */
 Eterm erts_check_process_code(Process *c_p, Eterm module, int *redsp, int fcalls);

@@ -591,6 +591,9 @@ is_boolean f s
 
 is_function2 f s s
 
+is_function_export2 f s s
+
+
 #################################################################
 # External function and bif calls.
 #################################################################

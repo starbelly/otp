@@ -1496,6 +1496,8 @@ bif_to_test_1(is_function, [_]=Ops, Fail) ->
     {test,is_function,Fail,Ops};
 bif_to_test_1(is_function, [_,_]=Ops, Fail) ->
     {test,is_function2,Fail,Ops};
+bif_to_test_1(is_function_export, [_,_]=Ops, Fail) ->
+    {test,is_function_export2,Fail,Ops};
 bif_to_test_1(is_function_export, [_]=Ops, Fail) ->
     {test,is_function_export,Fail,Ops};
 bif_to_test_1(is_integer,  [_]=Ops, Fail) ->

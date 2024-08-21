@@ -1304,6 +1304,48 @@ void BeamModuleAssembler::emit_is_function_export(const ArgLabel &Fail,
     a.b_ne(resolve_beam_label(Fail, disp1MB));
 }
 
+void BeamModuleAssembler::emit_is_function_export2(const ArgLabel &Fail,
+                                            const ArgSource &Src,
+                                            const ArgSource &Arity) {
+    if (!Arity.isSmall()) {
+        /*
+         * Non-literal arity - extremely uncommon. Generate simple code.
+         */
+        mov_arg(ARG2, Src);
+        mov_arg(ARG3, Arity);
+
+        emit_enter_runtime();
+
+        a.mov(ARG1, c_p);
+        runtime_call<3>(erl_is_function);
+
+        emit_leave_runtime();
+
+        a.cmp(ARG1, imm(am_true));
+        a.b_ne(resolve_beam_label(Fail, disp1MB));
+
+        return;
+    }
+
+    unsigned arity = Arity.as<ArgSmall>().getUnsigned();
+    if (arity > MAX_ARG) {
+        /* Arity is negative or too large. */
+        a.b(resolve_beam_label(Fail, disp128MB));
+        mark_unreachable();
+
+        return;
+    }
+
+
+    auto src = load_source(Src, TMP1);
+    emit_is_boxed(resolve_beam_label(Fail, dispUnknown), Src, src.reg);
+    a64::Gp boxed_ptr = emit_ptr_val(TMP1, src.reg);
+    a.ldur(TMP1.w(), emit_boxed_val(boxed_ptr));
+    a.mov(TMP2.w(), imm(MAKE_FUN_HEADER(arity, 0, 1) | _TAG_HEADER_MASK));
+    a.and_(TMP1.w(), TMP1.w(), TMP2.w());
+    cmp(TMP1, MAKE_FUN_HEADER(arity, 0, 1));
+    a.b_ne(resolve_beam_label(Fail, disp1MB));
+}
 
 void BeamModuleAssembler::emit_is_integer(const ArgLabel &Fail,
                                           const ArgSource &Src) {
