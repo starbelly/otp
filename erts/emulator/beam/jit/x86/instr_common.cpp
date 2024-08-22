@@ -1343,6 +1343,49 @@ void BeamModuleAssembler::emit_is_mfa(const ArgLabel &Fail,
     }, RET);
 }
 
+void BeamModuleAssembler::emit_is_mfa2(const ArgLabel &Fail,
+                                            const ArgSource &Src,
+                                            const ArgSource &Arity) {
+    if (!Arity.isSmall()) {
+        /* Non-small arity - extremely uncommon. Generate simple code. */
+        mov_arg(ARG2, Src);
+        mov_arg(ARG3, Arity);
+
+        emit_enter_runtime();
+
+        a.mov(ARG1, c_p);
+        runtime_call<3>(erl_is_function);
+
+        emit_leave_runtime();
+
+        a.cmp(RET, imm(am_true));
+        a.jne(resolve_beam_label(Fail));
+        return;
+    }
+
+    unsigned arity = Arity.as<ArgSmall>().getUnsigned();
+    if (arity > MAX_ARG) {
+        /* Arity is negative or too large. */
+        a.jmp(resolve_beam_label(Fail));
+        return;
+    }
+
+
+    mov_arg(RET, Src);
+
+    emit_is_boxed(resolve_beam_label(Fail), Src, RET);
+
+    preserve_cache([&]() {
+        x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
+
+        a.mov(RETd, emit_boxed_val(boxed_ptr, 0, sizeof(Uint32)));
+        a.and_(RETd, imm(MAKE_FUN_HEADER(arity, 0, 1) | _TAG_HEADER_MASK));
+        a.cmp(RETd, imm(MAKE_FUN_HEADER(arity, 0, 1)));
+        a.jne(resolve_beam_label(Fail));
+    }, RET);
+
+}
+
 void BeamModuleAssembler::emit_is_integer(const ArgLabel &Fail,
                                           const ArgSource &Src) {
     if (always_immediate(Src)) {

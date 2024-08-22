@@ -536,6 +536,8 @@ is_port f s
 is_boolean f s
 
 is_function2 f s s
+is_mfa2 f s s
+
 
 #################################################################
 # External function and bif calls.
