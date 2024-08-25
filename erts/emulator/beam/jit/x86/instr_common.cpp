@@ -1354,7 +1354,7 @@ void BeamModuleAssembler::emit_is_mfa2(const ArgLabel &Fail,
         emit_enter_runtime();
 
         a.mov(ARG1, c_p);
-        runtime_call<3>(erl_is_function);
+        runtime_call<3>(erl_is_mfa2);
 
         emit_leave_runtime();
 
