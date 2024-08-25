@@ -971,13 +971,13 @@ hot_is_function2(Fail, Fun, Arity) {
 }
 
 is_mfa(Fail, Fun) {
-   if (erl_is_mfa($Fun) != am_true) {
+   if (erl_is_mfa1($Fun) != am_true) {
        $FAIL($Fail);
    }
 }
 
 cold_is_mfa2(Fail, Fun, Arity) {
-    if (erl_is_mfa(c_p, $Fun, $Arity) != am_true ) {
+    if (erl_is_mfa2(c_p, $Fun, $Arity) != am_true) {
         $FAIL($Fail);
     }
 }

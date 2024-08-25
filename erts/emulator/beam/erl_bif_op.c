@@ -248,9 +248,8 @@ BIF_RETTYPE is_mfa_1(BIF_ALIST_1)
 BIF_RETTYPE is_mfa_2(BIF_ALIST_2)
 {
 
-    BIF_RET(erl_is_mfa(BIF_P, BIF_ARG_1, BIF_ARG_2));
+    BIF_RET(erl_is_mfa2(BIF_P, BIF_ARG_1, BIF_ARG_2));
 }
-
 
 
 Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
@@ -285,7 +284,21 @@ Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
     BIF_RET(am_false);
 }
 
-Eterm erl_is_mfa(Process* p, Eterm arg1, Eterm arg2)
+Eterm erl_is_mfa1(Eterm arg1)
+{
+
+    if (is_any_fun(arg1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+        if (is_external_fun(funp)) {
+            BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+
+Eterm erl_is_mfa2(Process* p, Eterm arg1, Eterm arg2)
 {
 
     if (is_any_fun(arg1)) {

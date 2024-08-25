@@ -27,7 +27,8 @@
 	 equality/1,ordering/1,
 	 fun_to_port/1,t_phash/1,t_phash2/1,md5/1,
 	 const_propagation/1,t_arity/1,t_is_function2/1,
-	 t_fun_info/1,t_fun_info_mfa/1,t_fun_to_list/1]).
+	 t_fun_info/1,t_fun_info_mfa/1,t_fun_to_list/1,
+         t_is_mfa2/1]).
 
 -export([nothing/0]).
 
@@ -44,7 +45,7 @@ all() ->
      equality, ordering, fun_to_port, t_phash,
      t_phash2, md5,
      const_propagation, t_arity, t_is_function2, t_fun_info,
-     t_fun_info_mfa,t_fun_to_list].
+     t_fun_info_mfa,t_fun_to_list, t_is_mfa2].
 
 init_per_testcase(_TestCase, Config) ->
     Config.
@@ -273,7 +274,7 @@ copy_term(Term) ->
 
 make_fun(X) ->
     fun() -> X end.
-	    
+
 %% Tests ordering of funs.
 ordering(Config) when is_list(Config) ->
     F1 = make_fun(1, 2),
@@ -481,7 +482,7 @@ t_phash2(Config) when is_list(Config) ->
     true = phash2(FF1) =/= phash2(FF2),
     true = phash2(FF1) =/= phash2(FF3),
     true = phash2(FF2) =/= phash2(FF3),
-    
+
     ok.
 
 phash2(Term) ->
@@ -503,7 +504,7 @@ md5(Config) when is_list(Config) ->
     bad_md5([B64K,fun(_X) -> 46 end]),
     bad_md5([B64K|fun(_X) -> 46 end]),
     ok.
-    
+
 bad_md5(Bad) ->
     {'EXIT',{badarg,_}} = (catch erlang:md5(Bad)).
 
@@ -602,6 +603,61 @@ t_is_function2(Config) when is_list(Config) ->
          end,
     ok.
 
+t_is_mfa2(Config) when is_list(Config) ->
+    false = is_mfa(id({a,b}), 0),
+    false = is_mfa(id({a,b}), 234343434333433433),
+    true = is_mfa(id(fun foo:bar/0), 0),
+    true = is_mfa(id(fun foo:bar/1), 1),
+    false = is_mfa(id(fun(_) -> ok end), 1),
+    false = is_mfa(id(fun() -> ok end), 0),
+
+    true = is_mfa(id(fun erlang:abs/1), 1),
+    true = is_mfa(id(fun erlang:abs/99), 99),
+    false = is_mfa(id(fun erlang:abs/1), 0),
+    false = is_mfa(id(fun erlang:abs/99), 0),
+    ok.
+    %false = is_function(id(self()), 0),
+    %false = is_function(id({a,b,c}), 0),
+    %false = is_function(id({a}), 0),
+    %false = is_function(id([a,b,c]), 0),
+    %
+    %%% Larger arities.
+    %F16 = id(fun f/16),
+    %F255 = id(fun f/255),
+    %
+    %false = is_function(id(self()), 16),
+    %true = is_function(F16, 16),
+    %ok = id(if is_function(F16, 16) -> ok; true -> error end),
+    %false = is_function(F255, 16),
+    %error = id(if is_function(F255, 16) -> ok; true -> error end),
+    %
+    %false = is_function(id(self()), 255),
+    %true = is_function(F255, 255),
+    %false = is_function(F16, 255),
+    %error = id(if is_function(F16, 255) -> ok; true -> error end),
+    %ok = id(if is_function(F255, 255) -> ok; true -> error end),
+    %
+    %%% Bad arity argument.
+    %bad_arity(a),
+    %bad_arity(-1),
+    %bad_arity(-9738974938734938793873498378),
+    %bad_arity([]),
+    %bad_arity(fun() -> ok end),
+    %bad_arity({}),
+    %bad_arity({a,b}),
+    %bad_arity(self()),
+    %
+    %%% Bad arity argument in guard test.
+    %Fun = id(fun erlang:abs/1),
+    %ok = if
+    %         is_function(Fun, -1) -> error;
+    %         is_function(Fun, 256) -> error;
+    %         is_function(Fun, a) -> error;
+    %         is_function(Fun, Fun) -> error;
+    %         true -> ok
+    %     end,
+    %ok.
+
 f(_A1, _A2, _A3, _A4, _A5, _A6, _A7, _A8,
   _A9, _A10, _A11, _A12, _A13, _A14, _A15, _A16) ->
     ok.
@@ -666,7 +722,7 @@ t_fun_info(Config) when is_list(Config) ->
     verify_not_undef(F, new_index),
     verify_not_undef(F, new_uniq),
     verify_not_undef(F, refc),
-    {'EXIT',_} = (catch erlang:fun_info(F, blurf)),    
+    {'EXIT',_} = (catch erlang:fun_info(F, blurf)),
 
     %% Module fun.
     FF = fun ?MODULE:t_fun_info/1,
