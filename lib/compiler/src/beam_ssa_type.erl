@@ -2799,7 +2799,7 @@ infer_type({bif,is_function}, [#b_var{}=Arg, Arity], _Ts, _Ds) ->
     end;
 infer_type({bif,is_mfa}, [#b_var{}=Arg], _Ts, _Ds) ->
     T = {Arg, #t_fun{}},
-    {[T], [T]};
+    {[T], []};
 infer_type({bif,is_mfa}, [#b_var{}=Arg, Arity], _Ts, _Ds) ->
     case Arity of
         #b_literal{val=V} when is_integer(V), V >= 0, V =< ?MAX_FUNC_ARGS ->

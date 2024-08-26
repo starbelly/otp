@@ -615,48 +615,47 @@ t_is_mfa2(Config) when is_list(Config) ->
     true = is_mfa(id(fun erlang:abs/99), 99),
     false = is_mfa(id(fun erlang:abs/1), 0),
     false = is_mfa(id(fun erlang:abs/99), 0),
+    false = is_mfa(id(self()), 0),
+    false = is_mfa(id({a,b,c}), 0),
+    false = is_mfa(id({a}), 0),
+    false = is_mfa(id([a,b,c]), 0),
+
+    %% Larger arities.
+    F16 = id(fun mod:f/16),
+    F255 = id(fun mod:f/255),
+
+    false = is_mfa(id(self()), 16),
+    true = is_mfa(F16, 16),
+    ok = id(if is_mfa(F16, 16) -> ok; true -> error end),
+    false = is_mfa(F255, 16),
+    error = id(if is_mfa(F255, 16) -> ok; true -> error end),
+
+    false = is_mfa(id(self()), 255),
+    true = is_mfa(F255, 255),
+    false = is_mfa(F16, 255),
+    error = id(if is_mfa(F16, 255) -> ok; true -> error end),
+    ok = id(if is_mfa(F255, 255) -> ok; true -> error end),
+
+    %% Bad arity argument.
+    bad_arity(a),
+    bad_arity(-1),
+    bad_arity(-9738974938734938793873498378),
+    bad_arity([]),
+    bad_arity(fun() -> ok end),
+    bad_arity({}),
+    bad_arity({a,b}),
+    bad_arity(self()),
+
+    %% Bad arity argument in guard test.
+    Fun = id(fun erlang:abs/1),
+    ok = if
+             is_mfa(Fun, -1) -> error;
+             is_mfa(Fun, 256) -> error;
+             is_mfa(Fun, a) -> error;
+             is_mfa(Fun, Fun) -> error;
+             true -> ok
+         end,
     ok.
-    %false = is_function(id(self()), 0),
-    %false = is_function(id({a,b,c}), 0),
-    %false = is_function(id({a}), 0),
-    %false = is_function(id([a,b,c]), 0),
-    %
-    %%% Larger arities.
-    %F16 = id(fun f/16),
-    %F255 = id(fun f/255),
-    %
-    %false = is_function(id(self()), 16),
-    %true = is_function(F16, 16),
-    %ok = id(if is_function(F16, 16) -> ok; true -> error end),
-    %false = is_function(F255, 16),
-    %error = id(if is_function(F255, 16) -> ok; true -> error end),
-    %
-    %false = is_function(id(self()), 255),
-    %true = is_function(F255, 255),
-    %false = is_function(F16, 255),
-    %error = id(if is_function(F16, 255) -> ok; true -> error end),
-    %ok = id(if is_function(F255, 255) -> ok; true -> error end),
-    %
-    %%% Bad arity argument.
-    %bad_arity(a),
-    %bad_arity(-1),
-    %bad_arity(-9738974938734938793873498378),
-    %bad_arity([]),
-    %bad_arity(fun() -> ok end),
-    %bad_arity({}),
-    %bad_arity({a,b}),
-    %bad_arity(self()),
-    %
-    %%% Bad arity argument in guard test.
-    %Fun = id(fun erlang:abs/1),
-    %ok = if
-    %         is_function(Fun, -1) -> error;
-    %         is_function(Fun, 256) -> error;
-    %         is_function(Fun, a) -> error;
-    %         is_function(Fun, Fun) -> error;
-    %         true -> ok
-    %     end,
-    %ok.
 
 f(_A1, _A2, _A3, _A4, _A5, _A6, _A7, _A8,
   _A9, _A10, _A11, _A12, _A13, _A14, _A15, _A16) ->

@@ -64,7 +64,7 @@
 %% atom 'compiler_generated', to indicate that the compiler has generated
 %% them and that no warning should be generated if they are optimized
 %% away.
-%% 
+%%
 %%
 %% In this translation:
 %%
@@ -343,7 +343,7 @@ guard(Gs0, St0) ->
 		end, guard_tests(last(Gs0)), droplast(Gs0)),
     {Gs,St} = gexpr_top(Gs1, St0#core{in_guard=true}),
     {Gs,St#core{in_guard=false}}.
-    
+
 guard_tests(Gs) ->
     L = element(2, hd(Gs)),
     {protect,L,foldr(fun (G, Rhs) -> {op,L,'and',G,Rhs} end, last(Gs), droplast(Gs))}.
@@ -489,7 +489,16 @@ gexpr_test(E0, Bools0, St0) ->
             {New,St2} = new_var(Lanno, St1),
             {icall_eq_true(New),
              Eps0 ++ [#iset{anno=Anno,var=New,arg=E1}],Bools0,St2};
-	#icall{anno=Anno,module=#c_literal{val=erlang},name=#c_literal{val=N},args=As} ->
+        #icall{anno=Anno,module=#c_literal{val=erlang},
+               name=#c_literal{val=is_mfa},
+               args=[_,_]} ->
+            %% is_mfa/2 is not a safe type test. We must force
+            %% it to be protected.
+            Lanno = Anno#a.anno,
+            {New,St2} = new_var(Lanno, St1),
+            {icall_eq_true(New),
+             Eps0 ++ [#iset{anno=Anno,var=New,arg=E1}],Bools0,St2};
+        #icall{anno=Anno,module=#c_literal{val=erlang},name=#c_literal{val=N},args=As} ->
             %% Note that erl_expand_records has renamed type
             %% tests to the new names; thus, float/1 as a type
             %% test will now be named is_float/1.
@@ -1515,7 +1524,7 @@ constant_bin_1(Es) ->
     end.
 
 %% verify_suitable_fields([{bin_element,_,Sz,Opts}=E|Es]) ->
-    
+
 verify_suitable_fields([{bin_element,_,Val,SzTerm,Opts}|Es]) ->
     case member(big, Opts) orelse member(little, Opts) of
 	true -> ok;
@@ -1634,7 +1643,7 @@ lc_tq(Line, E0, [], Mc0, St0) ->
     {set_anno(E, [compiler_generated|Anno]),Hps ++ Tps,St}.
 
 %% bc_tq(Line, Exp, [Qualifier], More, State) -> {LetRec,[PreExp],State}.
-%%  This TQ from Gustafsson ERLANG'05.  
+%%  This TQ from Gustafsson ERLANG'05.
 %%  More could be transformed before calling bc_tq.
 
 bc_tq(Line, Exp, Qs0, St0) ->
@@ -2993,7 +3002,7 @@ upattern_list([P0|Ps0], Ks, St0) ->
     {P1,Pg,Pv,Pu,St1} = upattern(P0, Ks, St0),
     {Ps1,Psg,Psv,Psu,St2} = upattern_list(Ps0, known_union(Ks, Pv), St1),
     {[P1|Ps1],Pg ++ Psg,union(Pv, Psv),union(Pu, Psu),St2};
-upattern_list([], _, St) -> {[],[],[],[],St}.    
+upattern_list([], _, St) -> {[],[],[],[],St}.
 
 %% upat_bin([Pat], [KnownVar], State) ->
 %%                        {[Pat],[GuardTest],[NewVar],[UsedVar],State}.
@@ -3020,7 +3029,7 @@ upat_bin([P0|Ps0], Ks, Bs, St0) ->
     {P1,Pg,Pv,Pu,Bs1,St1} = upat_element(P0, Ks, Bs, St0),
     {Ps1,Psg,Psv,Psu,St2} = upat_bin(Ps0, known_union(Ks, Pv), Bs1, St1),
     {[P1|Ps1],Pg ++ Psg,union(Pv, Psv),union(Pu, Psu),St2};
-upat_bin([], _, _, St) -> {[],[],[],[],St}.    
+upat_bin([], _, _, St) -> {[],[],[],[],St}.
 
 
 %% upat_element(Segment, [KnownVar], [LocalVar], State) ->
@@ -4024,7 +4033,7 @@ lit_vars(#c_cons{hd=H,tl=T}, Vs) -> lit_vars(H, lit_vars(T, Vs));
 lit_vars(#c_tuple{es=Es}, Vs) -> lit_list_vars(Es, Vs);
 lit_vars(#c_map{arg=V,es=Es}, Vs) -> lit_vars(V, lit_list_vars(Es, Vs));
 lit_vars(#c_map_pair{key=K,val=V}, Vs) -> lit_vars(K, lit_vars(V, Vs));
-lit_vars(#c_var{name=V}, Vs) -> add_element(V, Vs); 
+lit_vars(#c_var{name=V}, Vs) -> add_element(V, Vs);
 lit_vars(_, Vs) -> Vs.				%These are atomic
 
 lit_list_vars(Ls) -> lit_list_vars(Ls, []).

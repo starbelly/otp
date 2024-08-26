@@ -297,14 +297,32 @@ Eterm erl_is_mfa1(Eterm arg1)
     BIF_RET(am_false);
 }
 
-
 Eterm erl_is_mfa2(Process* p, Eterm arg1, Eterm arg2)
 {
+    Sint arity;
+
+    /*
+     * Verify argument 2 (arity); arity must be >= 0.
+     */
+    if (is_small(arg2)) {
+	arity = signed_val(arg2);
+	if (arity < 0) {
+	error:
+	    BIF_ERROR(p, BADARG);
+	}
+    } else if (is_big(arg2) && !bignum_header_is_neg(*big_val(arg2))) {
+	/* A positive bignum is OK, but can't possibly match. */
+	arity = -1;
+    } else {
+	/* Everything else (including negative bignum) is an error. */
+	goto error;
+    }
 
     if (is_any_fun(arg1)) {
-        ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
-        if (is_external_fun(funp)) {
-            BIF_RET(erl_is_function(p, arg1, arg2));
+	ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+
+        if (is_external_fun(funp) && fun_arity(funp) == (Uint) arity) {
+            BIF_RET(am_true);
         }
     }
 
