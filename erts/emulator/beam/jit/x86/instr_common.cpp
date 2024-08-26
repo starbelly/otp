@@ -1377,9 +1377,6 @@ void BeamModuleAssembler::emit_is_mfa2(const ArgLabel &Fail,
 
     preserve_cache([&]() {
         x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
-
-        a.mov(RETd, emit_boxed_val(boxed_ptr, 0, sizeof(Uint32)));
-        a.and_(RETd, imm(MAKE_FUN_HEADER(arity, 0, 1) | _TAG_HEADER_MASK));
         a.cmp(RETd, imm(MAKE_FUN_HEADER(arity, 0, 1)));
         a.jne(resolve_beam_label(Fail));
     }, RET);

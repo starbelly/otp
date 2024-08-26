@@ -1341,8 +1341,6 @@ void BeamModuleAssembler::emit_is_mfa2(const ArgLabel &Fail,
     emit_is_boxed(resolve_beam_label(Fail, dispUnknown), Src, src.reg);
     a64::Gp boxed_ptr = emit_ptr_val(TMP1, src.reg);
     a.ldur(TMP1.w(), emit_boxed_val(boxed_ptr));
-    a.mov(TMP2.w(), imm(MAKE_FUN_HEADER(arity, 0, 1) | _TAG_HEADER_MASK));
-    a.and_(TMP1.w(), TMP1.w(), TMP2.w());
     cmp(TMP1, MAKE_FUN_HEADER(arity, 0, 1));
     a.b_ne(resolve_beam_label(Fail, disp1MB));
 }
