@@ -32,7 +32,7 @@
 
 suite() -> [{ct_hooks,[ts_install_cth]}].
 
-all() -> 
+all() ->
     [bad_arith, bad_tuple, test_heap_guards, guard_bifs,
      type_tests, guard_bif_binary_part].
 
@@ -66,7 +66,7 @@ bad_tuple1(_) ->
 
 test_heap_guards(Config) when is_list(Config) ->
     ct:timetrap({minutes, 2}),
-    
+
     process_flag(trap_exit, true),
     Tuple = {a, tuple, is, built, here, xxx},
     List = [a, list, is, built, here],
@@ -482,20 +482,29 @@ type_tests(Test, [Type|T], Allowed) ->
 		    put(errors, get(errors) + 1)
 	    end;
 	false ->
-	    case catch type_test(Test, Value) of
-		{'EXIT',{function_clause,
-			 [{?MODULE,type_test,[Test,Value],Loc}|_]}}
-		when is_list(Loc) ->
-		    ok;
-		{'EXIT',Other} ->
-		    ct:fail({unexpected_error_reason,Other});
-		tuple when is_function(Value) ->
-		    io:format("Standard violation: Test ~p(~p) should fail",
+            case {Test, TypeTag} of
+                {closure, function} ->
+                    ok;
+                {function, closure} ->
+                    ok;
+                {export, function} ->
+                    ok;
+                {function, export} ->
+                    ok;
+                _ ->
+	            case catch type_test(Test, Value) of
+		        {'EXIT',{function_clause, [{?MODULE,type_test,[Test,Value],Loc}|_]}} when is_list(Loc) ->
+		            ok;
+		        {'EXIT',Other} ->
+		            ct:fail({unexpected_error_reason,Other});
+		        tuple when is_function(Value) ->
+		            io:format("Standard violation: Test ~p(~p) should fail",
 			      [Test, Value]),
-		    put(violations, get(violations) + 1);
-		_Other ->
-		    io:format("Test ~p(~p) succeeded (should fail)", [Test, Value]),
-		    put(errors, get(errors) + 1)
+		            put(violations, get(violations) + 1);
+		        _Other ->
+		            io:format("Test ~p(~p) succeeded (should fail)", [Test, Value]),
+		            put(errors, get(errors) + 1)
+                    end
 	    end
     end,
     type_tests(Test, T, Allowed);
@@ -516,7 +525,9 @@ all_types() ->
      {function, fun(_) -> "" end},
      {function, fun erlang:abs/1},
      {binary, list_to_binary([])},
-     {bitstring, <<0:7>>}].
+     {bitstring, <<0:7>>},
+     {closure, fun(_) -> "" end},
+     {export, fun erlang:abs/1}].
 
 type_test_desc() ->
     [{binary, [binary]},
@@ -532,7 +543,9 @@ type_test_desc() ->
      {pid, [pid]},
      {port, [port]},
      {reference, [ref]},
-     {function, [function]}].
+     {function, [function]},
+     {closure, [closure]},
+     {export, [export]}].
 
 type_test(integer, X) when is_integer(X) ->
     integer;
@@ -561,7 +574,11 @@ type_test(binary, X) when is_binary(X) ->
 type_test(bitstring, X) when is_bitstring(X) ->
     bitstring;
 type_test(function, X) when is_function(X) ->
-    function.
+    function;
+type_test(closure, X) when is_closure(X) ->
+    closure;
+type_test(export, X) when is_export(X) ->
+    export.
 
 make_port() ->
     hd(erlang:ports()).

@@ -133,12 +133,21 @@ will_succeed(erlang, is_function, [_, Arity]=Args) ->
         _ ->
             no
     end;
-will_succeed(erlang, is_mfa, [_, Arity]=Args) ->
+will_succeed(erlang, is_export, [_, Arity]=Args) ->
     case meet(Arity, #t_integer{}) of
         #t_integer{elements={Min,_}}=Arity when is_integer(Min), Min >= 0 ->
             yes;
         #t_integer{} ->
-            fails_on_conflict(erlang, is_mfa, Args);
+            fails_on_conflict(erlang, is_export, Args);
+        _ ->
+            no
+    end;
+will_succeed(erlang, is_closure, [_, Arity]=Args) ->
+    case meet(Arity, #t_integer{}) of
+        #t_integer{elements={Min,_}}=Arity when is_integer(Min), Min >= 0 ->
+            yes;
+        #t_integer{} ->
+            fails_on_conflict(erlang, is_closure, Args);
         _ ->
             no
     end;
@@ -401,7 +410,7 @@ types(erlang, is_function, [Type, ArityType]) ->
     sub_unsafe(RetType, [any, any]);
 types(erlang, is_function, [Type]) ->
     sub_unsafe_type_test(Type, #t_fun{});
-types(erlang, is_mfa, [Type, ArityType]) ->
+types(erlang, is_export, [Type, ArityType]) ->
     RetType = case meet(ArityType, #t_integer{}) of
                   none ->
                       none;
@@ -426,7 +435,34 @@ types(erlang, is_mfa, [Type, ArityType]) ->
                       end
               end,
     sub_unsafe(RetType, [any, any]);
-types(erlang, is_mfa, [Type]) ->
+types(erlang, is_export, [Type]) ->
+    sub_unsafe_type_test(Type, #t_fun{});
+types(erlang, is_closure, [Type, ArityType]) ->
+    RetType = case meet(ArityType, #t_integer{}) of
+                  none ->
+                      none;
+                  #t_integer{elements={Arity,Arity}}
+                    when is_integer(Arity) ->
+                      if
+                          Arity < 0 ->
+                              none;
+                          0 =< Arity, Arity =< ?MAX_FUNC_ARGS ->
+                              case meet(Type, #t_fun{arity=Arity}) of
+                                  Type -> #t_atom{elements=[true]};
+                                  none -> #t_atom{elements=[false]};
+                                  _ -> beam_types:make_boolean()
+                              end;
+                          Arity > ?MAX_FUNC_ARGS ->
+                              #t_atom{elements=[false]}
+                      end;
+                  #t_integer{} ->
+                      case meet(Type, #t_fun{}) of
+                          none -> #t_atom{elements=[false]};
+                          _ -> beam_types:make_boolean()
+                      end
+              end,
+    sub_unsafe(RetType, [any, any]);
+types(erlang, is_closure, [Type]) ->
     sub_unsafe_type_test(Type, #t_fun{});
 types(erlang, is_integer, [Type]) ->
     sub_unsafe_type_test(Type, #t_integer{});

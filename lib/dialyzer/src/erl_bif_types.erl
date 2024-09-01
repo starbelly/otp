@@ -649,13 +649,13 @@ type(erlang, is_function, 2, Xs, Opaques) ->
 	    end
 	end,
   strict(erlang, is_function, 2, Xs, Fun, Opaques);
-type(erlang, is_mfa, 1, Xs, Opaques) ->
+type(erlang, is_export, 1, Xs, Opaques) ->
   Fun = fun (X) ->
             check_guard(X, fun (Y) -> t_is_fun(Y, Opaques) end,
                         t_fun(), Opaques)
         end,
-  strict(erlang, is_mfa, 1, Xs, Fun, Opaques);
-type(erlang, is_mfa, 2, Xs, Opaques) ->
+  strict(erlang, is_export, 1, Xs, Fun, Opaques);
+type(erlang, is_export, 2, Xs, Opaques) ->
   Fun = fun ([FunType, ArityType]) ->
 	    case t_number_vals(ArityType, Opaques) of
 	      unknown -> t_boolean();
@@ -668,7 +668,27 @@ type(erlang, is_mfa, 2, Xs, Opaques) ->
 	      IntList when is_list(IntList) -> t_boolean() %% true?
 	    end
 	end,
-  strict(erlang, is_mfa, 2, Xs, Fun, Opaques);
+  strict(erlang, is_export, 2, Xs, Fun, Opaques);
+type(erlang, is_closure, 1, Xs, Opaques) ->
+  Fun = fun (X) ->
+            check_guard(X, fun (Y) -> t_is_fun(Y, Opaques) end,
+                        t_fun(), Opaques)
+        end,
+  strict(erlang, is_closure, 1, Xs, Fun, Opaques);
+type(erlang, is_closure, 2, Xs, Opaques) ->
+  Fun = fun ([FunType, ArityType]) ->
+	    case t_number_vals(ArityType, Opaques) of
+	      unknown -> t_boolean();
+	      [Val] ->
+		FunConstr = t_fun(any_list(Val), t_any()),
+		Fun2 = fun (X) ->
+			   t_is_subtype(X, FunConstr) andalso (not t_is_none(X))
+		       end,
+		check_guard_single(FunType, Fun2, FunConstr, Opaques);
+	      IntList when is_list(IntList) -> t_boolean() %% true?
+	    end
+	end,
+  strict(erlang, is_closure, 2, Xs, Fun, Opaques);
 type(erlang, is_integer, 1, Xs, Opaques) ->
   Fun = fun (X) ->
 	    check_guard(X, fun (Y) -> t_is_integer(Y, Opaques) end,
@@ -2301,9 +2321,13 @@ arg_types(erlang, is_function, 1) ->
   [t_any()];
 arg_types(erlang, is_function, 2) ->
   [t_any(), t_arity()];
-arg_types(erlang, is_mfa, 1) ->
+arg_types(erlang, is_export, 1) ->
   [t_any()];
-arg_types(erlang, is_mfa, 2) ->
+arg_types(erlang, is_export, 2) ->
+  [t_any(), t_arity()];
+arg_types(erlang, is_closure, 1) ->
+  [t_any()];
+arg_types(erlang, is_closure, 2) ->
   [t_any(), t_arity()];
 arg_types(erlang, is_integer, 1) ->
   [t_any()];

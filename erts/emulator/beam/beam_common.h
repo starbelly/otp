@@ -258,7 +258,8 @@ const Export *apply(Process* p, Eterm* reg, ErtsCodePtr I, Uint offs);
 ErtsCodePtr call_fun(Process* p, int arity, Eterm* reg, Eterm args);
 ErtsCodePtr apply_fun(Process* p, Eterm fun, Eterm args, Eterm* reg);
 int is_function2(Eterm Term, Uint arity);
-int is_mfa2(Eterm Term, Uint arity);
+int is_export2(Eterm Term, Uint arity);
+int is_closure2(Eterm Term, Uint arity);
 
 Eterm erts_gc_new_map(Process* p, Eterm* reg, Uint live,
                       Uint n, const Eterm* data);

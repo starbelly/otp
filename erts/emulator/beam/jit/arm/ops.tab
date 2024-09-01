@@ -591,7 +591,9 @@ is_boolean f s
 
 is_function2 f s s
 
-is_mfa2 f s s
+is_export2 f s s
+
+is_closure2 f s s
 
 
 #################################################################
@@ -887,8 +889,14 @@ is_function f S
 is_function Fail=f c => jump Fail
 
 %hot
-is_mfa f S
-is_mfa Fail=f c => jump Fail
+
+is_export f S
+is_export Fail=f c => jump Fail
+
+%hot
+
+is_closure f S
+is_closure Fail=f c => jump Fail
 
 # The start and end of a function.
 int_func_start/5

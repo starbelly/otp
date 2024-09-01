@@ -467,12 +467,30 @@ vi({test,is_function2,{f,Lbl},[Src0,_Arity]}, Vst) ->
            fun(SuccVst) ->
                    update_type(fun meet/2, #t_fun{}, Src, SuccVst)
            end);
-vi({test,is_mfa,{f,Lbl},[Src]}, Vst) ->
+vi({test,is_export,{f,Lbl},[Src]}, Vst) ->
     type_test(Lbl, #t_fun{}, Src, Vst);
-vi({test,is_mfa2,{f,Lbl},[Src,{integer,Arity}]}, Vst)
+vi({test,is_export2,{f,Lbl},[Src,{integer,Arity}]}, Vst)
   when Arity >= 0, Arity =< ?MAX_FUNC_ARGS ->
     type_test(Lbl, #t_fun{arity=Arity}, Src, Vst);
-vi({test,is_mfa2,{f,Lbl},[Src0,_Arity]}, Vst) ->
+vi({test,is_export2,{f,Lbl},[Src0,_Arity]}, Vst) ->
+    Src = unpack_typed_arg(Src0, Vst),
+    assert_term(Src, Vst),
+    branch(Lbl, Vst,
+           fun(FailVst) ->
+                   %% We cannot subtract the function type when the arity is
+                   %% unknown: `Src` may still be a function if the arity is
+                   %% outside the allowed range.
+                   FailVst
+           end,
+           fun(SuccVst) ->
+                   update_type(fun meet/2, #t_fun{}, Src, SuccVst)
+           end);
+vi({test,is_closure,{f,Lbl},[Src]}, Vst) ->
+    type_test(Lbl, #t_fun{}, Src, Vst);
+vi({test,is_closure2,{f,Lbl},[Src,{integer,Arity}]}, Vst)
+  when Arity >= 0, Arity =< ?MAX_FUNC_ARGS ->
+    type_test(Lbl, #t_fun{arity=Arity}, Src, Vst);
+vi({test,is_closure2,{f,Lbl},[Src0,_Arity]}, Vst) ->
     Src = unpack_typed_arg(Src0, Vst),
     assert_term(Src, Vst),
     branch(Lbl, Vst,
@@ -2283,11 +2301,11 @@ infer_types_1(#value{op={bif,is_function},args=[Src,_Arity]}, Val, Op, Vst) ->
     end;
 infer_types_1(#value{op={bif,is_function},args=[Src]}, Val, Op, Vst) ->
     infer_type_test_bif(#t_fun{}, Src, Val, Op, Vst);
-infer_types_1(#value{op={bif,is_mfa},args=[Src,{integer,Arity}]},
+infer_types_1(#value{op={bif,is_export},args=[Src,{integer,Arity}]},
               Val, Op, Vst)
   when Arity >= 0, Arity =< ?MAX_FUNC_ARGS ->
     infer_type_test_bif(#t_fun{arity=Arity}, Src, Val, Op, Vst);
-infer_types_1(#value{op={bif,is_mfa},args=[Src,_Arity]}, Val, Op, Vst) ->
+infer_types_1(#value{op={bif,is_export},args=[Src,_Arity]}, Val, Op, Vst) ->
     case Val of
         {atom, Bool} when Op =:= eq_exact, Bool; Op =:= ne_exact, not Bool ->
             update_type(fun meet/2, #t_fun{}, Src, Vst);
@@ -2297,7 +2315,23 @@ infer_types_1(#value{op={bif,is_mfa},args=[Src,_Arity]}, Val, Op, Vst) ->
             %% allowed range.
             Vst
     end;
-infer_types_1(#value{op={bif,is_mfa},args=[Src]}, Val, Op, Vst) ->
+infer_types_1(#value{op={bif,is_export},args=[Src]}, Val, Op, Vst) ->
+    infer_type_test_bif(#t_fun{}, Src, Val, Op, Vst);
+infer_types_1(#value{op={bif,is_closure},args=[Src,{integer,Arity}]},
+              Val, Op, Vst)
+  when Arity >= 0, Arity =< ?MAX_FUNC_ARGS ->
+    infer_type_test_bif(#t_fun{arity=Arity}, Src, Val, Op, Vst);
+infer_types_1(#value{op={bif,is_closure},args=[Src,_Arity]}, Val, Op, Vst) ->
+    case Val of
+        {atom, Bool} when Op =:= eq_exact, Bool; Op =:= ne_exact, not Bool ->
+            update_type(fun meet/2, #t_fun{}, Src, Vst);
+        _ ->
+            %% We cannot subtract the function type when the arity is unknown:
+            %% `Src` may still be a function if the arity is outside the
+            %% allowed range.
+            Vst
+    end;
+infer_types_1(#value{op={bif,is_closure},args=[Src]}, Val, Op, Vst) ->
     infer_type_test_bif(#t_fun{}, Src, Val, Op, Vst);
 infer_types_1(#value{op={bif,is_integer},args=[Src]}, Val, Op, Vst) ->
     infer_type_test_bif(#t_integer{}, Src, Val, Op, Vst);

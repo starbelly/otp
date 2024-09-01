@@ -54,8 +54,7 @@ pred.never_fails(Bif) {
 	 am_is_pid,
 	 am_is_port,
 	 am_is_reference,
-	 am_is_tuple,
-         am_is_mfa,
+	 am_is_tuple
 	};
 
     Uint index = Bif.val;
@@ -68,7 +67,7 @@ pred.never_fails(Bif) {
 	    return 0;
 	}
 
-	if (entry->function == am_is_function) {
+	if (entry->function == am_is_function || entry->function == am_is_export || entry->function == am_is_closure) {
 	    /* Note that is_function/2 may fail. */
 	    return entry->arity == 1;
 	}

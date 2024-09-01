@@ -959,10 +959,16 @@ resolve_inst({call_fun,[{u,N}]},_,_,_) ->
 resolve_inst({is_function=I,Args0},_,_,_) ->
     [L|Args] = resolve_args(Args0),
     {test,I,L,Args};
-resolve_inst({is_mfa=I,Args0},_,_,_) ->
+resolve_inst({is_export=I,Args0},_,_,_) ->
     [L|Args] = resolve_args(Args0),
     {test,I,L,Args};
-resolve_inst({is_mfa2=I,Args0},_,_,_) ->
+resolve_inst({is_export2=I,Args0},_,_,_) ->
+    [L|Args] = resolve_args(Args0),
+    {test,I,L,Args};
+resolve_inst({is_closure=I,Args0},_,_,_) ->
+    [L|Args] = resolve_args(Args0),
+    {test,I,L,Args};
+resolve_inst({is_closure2=I,Args0},_,_,_) ->
     [L|Args] = resolve_args(Args0),
     {test,I,L,Args};
 resolve_inst({call_ext_only,[{u,N},{u,MFAix}]},Imports,_,_) ->
