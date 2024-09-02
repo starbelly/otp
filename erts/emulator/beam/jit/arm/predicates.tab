@@ -67,8 +67,10 @@ pred.never_fails(Bif) {
 	    return 0;
 	}
 
-	if (entry->function == am_is_function) {
-	    /* Note that is_function/2 may fail. */
+	if (entry->function == am_is_function ||
+            entry->function == am_is_export ||
+            entry->function == am_is_closure) {
+	    /* Note that is_function/2, is_closure/2, and is_export/2 may fail. */
 	    return entry->arity == 1;
 	}
 

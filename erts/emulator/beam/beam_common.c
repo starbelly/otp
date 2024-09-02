@@ -1879,6 +1879,32 @@ is_function2(Eterm Term, Uint arity)
     return 0;
 }
 
+int
+is_closure2(Eterm Term, Uint arity)
+{
+    if (is_any_fun(Term)) {
+        ErlFunThing *funp = (ErlFunThing*)fun_val(Term);
+        if (!is_external_fun(funp)) {
+            return fun_arity(funp) == arity;
+        }
+    }
+
+    return 0;
+}
+
+int
+is_export2(Eterm Term, Uint arity)
+{
+    if (is_any_fun(Term)) {
+        ErlFunThing *funp = (ErlFunThing*)fun_val(Term);
+        if (is_external_fun(funp)) {
+            return fun_arity(funp) == arity;
+        }
+    }
+
+    return 0;
+}
+
 Eterm get_map_element(Eterm map, Eterm key)
 {
     erts_ihash_t hx;

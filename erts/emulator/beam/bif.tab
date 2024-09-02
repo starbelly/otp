@@ -342,6 +342,10 @@ ubif erlang:is_reference/1
 ubif erlang:is_binary/1
 ubif erlang:is_function/1
 ubif erlang:is_function/2
+ubif erlang:is_closure/1
+ubif erlang:is_closure/2
+ubif erlang:is_export/1
+ubif erlang:is_export/2
 ubif erlang:is_record/2
 ubif erlang:is_record/3
 

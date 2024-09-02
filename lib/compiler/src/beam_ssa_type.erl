@@ -2797,6 +2797,37 @@ infer_type({bif,is_function}, [#b_var{}=Arg, Arity], _Ts, _Ds) ->
             T = {Arg, #t_fun{}},
             {[T], []}
     end;
+
+infer_type({bif,is_closure}, [#b_var{}=Arg], _Ts, _Ds) ->
+    T = {Arg, #t_fun{}},
+    {[T], []};
+infer_type({bif,is_closure}, [#b_var{}=Arg, Arity], _Ts, _Ds) ->
+    case Arity of
+        #b_literal{val=V} when is_integer(V), V >= 0, V =< ?MAX_FUNC_ARGS ->
+            T = {Arg, #t_fun{arity=V}},
+            {[T], [T]};
+        _ ->
+            %% We cannot subtract the function type when the arity is unknown:
+            %% `Arg` may still be a function if the arity is outside the
+            %% allowed range.
+            T = {Arg, #t_fun{}},
+            {[T], []}
+    end;
+infer_type({bif,is_export}, [#b_var{}=Arg], _Ts, _Ds) ->
+    T = {Arg, #t_fun{}},
+    {[T], []};
+infer_type({bif,is_export}, [#b_var{}=Arg, Arity], _Ts, _Ds) ->
+    case Arity of
+        #b_literal{val=V} when is_integer(V), V >= 0, V =< ?MAX_FUNC_ARGS ->
+            T = {Arg, #t_fun{arity=V}},
+            {[T], [T]};
+        _ ->
+            %% We cannot subtract the function type when the arity is unknown:
+            %% `Arg` may still be a function if the arity is outside the
+            %% allowed range.
+            T = {Arg, #t_fun{}},
+            {[T], []}
+    end;
 infer_type({bif,is_integer}, [#b_var{}=Arg], _Ts, _Ds) ->
     T = {Arg, #t_integer{}},
     {[T], [T]};

@@ -95,7 +95,12 @@ mfa(Config) when is_list(Config) ->
     true = ?APPLY2(Erlang, is_function, fun erlang:list_to_binary/1, 1),
     true = ?APPLY2(Erlang, is_function, fun() -> ok end, 0),
     false = ?APPLY2(Erlang, is_function, blurf, 0),
-
+    true = ?APPLY1(Erlang, is_export, fun erlang:list_to_binary/1),
+    false = ?APPLY1(Erlang, is_export, fun() -> ok end),
+    false = ?APPLY1(Erlang, is_export, blurf),
+    false = ?APPLY1(Erlang, is_closure, fun erlang:list_to_binary/1),
+    true = ?APPLY1(Erlang, is_closure, fun() -> ok end),
+    false = ?APPLY1(Erlang, is_closure, blurf),
     apply(Mod, foo, []).
 
 %% The single call to this function with a literal argument caused type

@@ -1326,6 +1326,116 @@ void BeamModuleAssembler::emit_is_function2(const ArgLabel &Fail,
     });
 }
 
+void BeamModuleAssembler::emit_is_closure(const ArgLabel &Fail,
+                                                  const ArgRegister &Src) {
+    mov_arg(RET, Src);
+
+    emit_is_boxed(resolve_beam_label(Fail), Src, RET);
+
+    preserve_cache([&]() {
+        x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
+
+        a.mov(RETd, emit_boxed_val(boxed_ptr, 0, sizeof(Uint32)));
+        a.and_(RETd, imm(MAKE_FUN_HEADER(0, 1, 0) | _TAG_IMMED1_MASK));
+        a.cmp(RETd, imm(MAKE_FUN_HEADER(0, 1, 0)));
+        a.jne(resolve_beam_label(Fail));
+    }, RET);
+}
+
+void BeamModuleAssembler::emit_is_closure2(const ArgLabel &Fail,
+                                            const ArgSource &Src,
+                                            const ArgSource &Arity) {
+    if (!Arity.isSmall()) {
+        /* Non-small arity - extremely uncommon. Generate simple code. */
+        mov_arg(ARG2, Src);
+        mov_arg(ARG3, Arity);
+
+        emit_enter_runtime();
+
+        a.mov(ARG1, c_p);
+        runtime_call<3>(erl_is_export2);
+
+        emit_leave_runtime();
+
+        a.cmp(RET, imm(am_true));
+        a.jne(resolve_beam_label(Fail));
+        return;
+    }
+
+    unsigned arity = Arity.as<ArgSmall>().getUnsigned();
+    if (arity > MAX_ARG) {
+        /* Arity is negative or too large. */
+        a.jmp(resolve_beam_label(Fail));
+        return;
+    }
+
+
+    mov_arg(RET, Src);
+
+    emit_is_boxed(resolve_beam_label(Fail), Src, RET);
+
+    preserve_cache([&]() {
+        x86::Gp boxed_ptr = emit_ptr_val(RET, RET);
+        a.cmp(RETd, imm(MAKE_FUN_HEADER(arity, 1, 0)));
+        a.jne(resolve_beam_label(Fail));
+    }, RET);
+
+}
+
+void BeamModuleAssembler::emit_is_export(const ArgLabel &Fail,
+                                           const ArgRegister &Src) {
+
+    auto src = load_source(Src, TMP1);
+    emit_is_boxed(resolve_beam_label(Fail, dispUnknown), Src, src.reg);
+    a64::Gp boxed_ptr = emit_ptr_val(TMP1, src.reg);
+    a.ldur(TMP1.w(), emit_boxed_val(boxed_ptr));
+    a.mov(TMP2.w(), imm(MAKE_FUN_HEADER(0, 0, 1) | _TAG_HEADER_MASK));
+    a.and_(TMP1.w(), TMP1.w(), TMP2.w());
+    cmp(TMP1, MAKE_FUN_HEADER(0, 0, 1));
+    a.b_ne(resolve_beam_label(Fail, disp1MB));
+}
+
+void BeamModuleAssembler::emit_is_export2(const ArgLabel &Fail,
+                                            const ArgSource &Src,
+                                            const ArgSource &Arity) {
+    if (!Arity.isSmall()) {
+        /*
+         * Non-literal arity - extremely uncommon. Generate simple code.
+         */
+        mov_arg(ARG2, Src);
+        mov_arg(ARG3, Arity);
+
+        emit_enter_runtime();
+
+        a.mov(ARG1, c_p);
+        runtime_call<3>(erl_is_export2);
+
+        emit_leave_runtime();
+
+        a.cmp(ARG1, imm(am_true));
+        a.b_ne(resolve_beam_label(Fail, disp1MB));
+
+        return;
+    }
+
+    unsigned arity = Arity.as<ArgSmall>().getUnsigned();
+    if (arity > MAX_ARG) {
+        /* Arity is negative or too large. */
+        a.b(resolve_beam_label(Fail, disp128MB));
+        mark_unreachable();
+
+        return;
+    }
+
+
+    auto src = load_source(Src, TMP1);
+    emit_is_boxed(resolve_beam_label(Fail, dispUnknown), Src, src.reg);
+    a64::Gp boxed_ptr = emit_ptr_val(TMP1, src.reg);
+    a.ldur(TMP1.w(), emit_boxed_val(boxed_ptr));
+    cmp(TMP1, MAKE_FUN_HEADER(arity, 0, 1));
+    a.b_ne(resolve_beam_label(Fail, disp1MB));
+}
+
 void BeamModuleAssembler::emit_is_integer(const ArgLabel &Fail,
                                           const ArgSource &Src) {
     if (always_immediate(Src)) {

@@ -541,6 +541,22 @@ pre_is_safe_bool(Var, Sub) ->
                 #b_var{} ->
                     false
             end;
+        #{Var:=#b_set{op={bif,is_closure},
+                      args=[_,Arity]}} ->
+            case Arity of
+                #b_literal{val=Lit} ->
+                    is_integer(Lit) andalso Lit >= 0;
+                #b_var{} ->
+                    false
+            end;
+        #{Var:=#b_set{op={bif,is_export},
+                      args=[_,Arity]}} ->
+            case Arity of
+                #b_literal{val=Lit} ->
+                    is_integer(Lit) andalso Lit >= 0;
+                #b_var{} ->
+                    false
+            end;
         #{Var:=#b_set{op={bif,Op},args=Args}} ->
             Arity = length(Args),
             erl_internal:bool_op(Op, Arity) andalso

@@ -479,7 +479,8 @@ A list of binaries. This datatype is useful to use together with
 
 -export([abs/1, append/2, element/2, get_module_info/2, hd/1,
          is_atom/1, is_binary/1, is_bitstring/1, is_boolean/1,
-         is_float/1, is_function/1, is_function/2, is_integer/1,
+         is_float/1, is_function/1, is_function/2, is_closure/1,
+         is_closure/2, is_export/1, is_export/2, is_integer/1,
          is_list/1, is_map/1, is_number/1, is_pid/1, is_port/1, is_record/2,
          is_record/3, is_reference/1, is_tuple/1, load_module/2,
          load_nif/2, localtime_to_universaltime/2, make_fun/3,
@@ -6702,6 +6703,50 @@ arguments, otherwise `false`.
       Term :: term(),
       Arity :: arity().
 is_function(_Term, _Arity) ->
+    erlang:nif_error(undefined).
+
+%% Shadowed by erl_bif_types: erlang:is_closure/1
+-doc """
+Returns `true` if `Term` is a fun that closes its module version and/or enviroment it was created in, otherwise `false`.
+""".
+-doc #{ group => terms }.
+-spec is_closure(Term) -> boolean() when
+      Term :: term().
+is_closure(_Term) ->
+    erlang:nif_error(undefined).
+
+%% Shadowed by erl_bif_types: erlang:is_closure/2
+-doc """
+Returns `true` if `Term` is a fun closure that can be applied with `Arity` number of
+arguments, otherwise `false`.
+""".
+-doc #{ group => terms }.
+-spec is_closure(Term, Arity) -> boolean() when
+      Term :: term(),
+      Arity :: arity().
+is_closure(_Term, _Arity) ->
+    erlang:nif_error(undefined).
+
+%% Shadowed by erl_bif_types: erlang:is_export/1
+-doc """
+Returns `true` if `Term` is a export fun entry, otherwise `false`.
+""".
+-doc #{ group => terms }.
+-spec is_export(Term) -> boolean() when
+      Term :: term().
+is_export(_Term) ->
+    erlang:nif_error(undefined).
+
+%% Shadowed by erl_bif_types: erlang:is_export/2
+-doc """
+Returns `true` if `Term` is a export fun entry that can be applied with `Arity` number of
+arguments, otherwise `false`.
+""".
+-doc #{ group => terms }.
+-spec is_export(Term, Arity) -> boolean() when
+      Term :: term(),
+      Arity :: arity().
+is_export(_Term, _Arity) ->
     erlang:nif_error(undefined).
 
 %% Shadowed by erl_bif_types: erlang:is_integer/1

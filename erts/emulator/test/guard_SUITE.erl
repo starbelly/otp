@@ -23,7 +23,7 @@
 -export([all/0, suite/0,
          bad_arith/1, bad_tuple/1,
 	 test_heap_guards/1, guard_bifs/1,
-	 type_tests/1,guard_bif_binary_part/1]).
+	 type_tests/1,guard_bif_binary_part/1, guard_bif_is_closure/1, guard_bif_is_export/1]).
 
 -include_lib("common_test/include/ct.hrl").
 
@@ -34,7 +34,7 @@ suite() -> [{ct_hooks,[ts_install_cth]}].
 
 all() -> 
     [bad_arith, bad_tuple, test_heap_guards, guard_bifs,
-     type_tests, guard_bif_binary_part].
+     type_tests, guard_bif_binary_part, guard_bif_is_closure, guard_bif_is_export].
 
 
 %% Test that a bad arithmetic operation in a guard works correctly.
@@ -304,6 +304,54 @@ bptest(B,A,C)  when erlang:binary_part(B,{A,C}) =:= <<3,3>> ->
 bptest(_,_,_) ->
     error.
 
+
+guard_bif_is_closure(_) ->
+    ok = closure_test(id(fun() -> ok end)),
+    ok = closure_test(id(fun(_) -> ok end)),
+    ok = closure_test(id(fun(_,_) -> ok end)),
+    fail = closure_test(id(fun erlang:abs/1)),
+    fail = closure_test(id(fun mod:not_loaded/0)),
+    fail = closure_test(foo),
+    fail = closure_test(self()),
+    fail = closure_test(make_ref()),
+    fail = closure_test([]),
+    fail = closure_test([a]),
+    fail = closure_test({a,b}),
+    fail = closure_test(42),
+    fail = closure_test(387924.0),
+    fail = closure_test(392742928742947293873938792874019287447829874290742),
+    fail = closure_test(list_to_binary([])),
+    fail = closure_test(<<0:7>>),
+    ok.
+
+guard_bif_is_export(_) ->
+    ok = export_test(id(fun erlang:abs/1)),
+    ok = export_test(id(fun mod:not_loaded/0)),
+    fail = export_test(id(fun() -> ok end)),
+    fail = export_test(id(fun(_) -> ok end)),
+    fail = export_test(id(fun(_,_) -> ok end)),
+    fail = export_test(foo),
+    fail = export_test(self()),
+    fail = export_test(make_ref()),
+    fail = export_test([]),
+    fail = export_test([a]),
+    fail = export_test({a,b}),
+    fail = export_test(42),
+    fail = export_test(387924.0),
+    fail = export_test(392742928742947293873938792874019287447829874290742),
+    fail = export_test(list_to_binary([])),
+    fail = export_test(<<0:7>>),
+    ok.
+
+closure_test(F) when is_closure(F) ->
+    ok;
+closure_test(_) ->
+    fail.
+
+export_test(F) when is_export(F) ->
+    ok;
+export_test(_) ->
+    fail.
 
 %% Test all guard bifs with nasty (but legal arguments).
 guard_bifs(Config) when is_list(Config) ->

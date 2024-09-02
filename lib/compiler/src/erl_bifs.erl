@@ -111,6 +111,10 @@ is_pure(erlang, is_bitstring, 1) -> true;
 is_pure(erlang, is_float, 1) -> true;
 is_pure(erlang, is_function, 1) -> true;
 is_pure(erlang, is_function, 2) -> true;
+is_pure(erlang, is_closure, 1) -> true;
+is_pure(erlang, is_closure, 2) -> true;
+is_pure(erlang, is_export, 1) -> true;
+is_pure(erlang, is_export, 2) -> true;
 is_pure(erlang, is_integer, 1) -> true;
 is_pure(erlang, is_list, 1) -> true;
 is_pure(erlang, is_map, 1) -> true;
@@ -190,7 +194,7 @@ is_pure(_, _, _) -> false.
 %%
 %%      NOTES
 %%
-%%      is_function/2 is not safe: is_function(X, foo) will fail.
+%%      is_function/2, is_closure/2, and is_export/2 is not safe: is_function(X, foo) will fail.
 %%
 %%      is_record/3 is not safe: is_record(X, foo, bar) will fail.
 %%
@@ -219,6 +223,8 @@ is_safe(erlang, is_binary, 1) -> true;
 is_safe(erlang, is_bitstring, 1) -> true;
 is_safe(erlang, is_float, 1) -> true;
 is_safe(erlang, is_function, 1) -> true;
+is_safe(erlang, is_closure, 1) -> true;
+is_safe(erlang, is_export, 1) -> true;
 is_safe(erlang, is_integer, 1) -> true;
 is_safe(erlang, is_list, 1) -> true;
 is_safe(erlang, is_map, 1) -> true;

@@ -489,7 +489,25 @@ gexpr_test(E0, Bools0, St0) ->
             {New,St2} = new_var(Lanno, St1),
             {icall_eq_true(New),
              Eps0 ++ [#iset{anno=Anno,var=New,arg=E1}],Bools0,St2};
-	#icall{anno=Anno,module=#c_literal{val=erlang},name=#c_literal{val=N},args=As} ->
+        #icall{anno=Anno,module=#c_literal{val=erlang},
+               name=#c_literal{val=is_closure},
+               args=[_,_]} ->
+            %% is_closure/2 is not a safe type test. We must force
+            %% it to be protected.
+            Lanno = Anno#a.anno,
+            {New,St2} = new_var(Lanno, St1),
+            {icall_eq_true(New),
+             Eps0 ++ [#iset{anno=Anno,var=New,arg=E1}],Bools0,St2};
+        #icall{anno=Anno,module=#c_literal{val=erlang},
+               name=#c_literal{val=is_export},
+               args=[_,_]} ->
+            %% is_export/2 is not a safe type test. We must force
+            %% it to be protected.
+            Lanno = Anno#a.anno,
+            {New,St2} = new_var(Lanno, St1),
+            {icall_eq_true(New),
+             Eps0 ++ [#iset{anno=Anno,var=New,arg=E1}],Bools0,St2};
+        #icall{anno=Anno,module=#c_literal{val=erlang},name=#c_literal{val=N},args=As} ->
             %% Note that erl_expand_records has renamed type
             %% tests to the new names; thus, float/1 as a type
             %% test will now be named is_float/1.

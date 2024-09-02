@@ -263,6 +263,134 @@ Eterm erl_is_function(Process* p, Eterm arg1, Eterm arg2)
     BIF_RET(am_false);
 }
 
+BIF_RETTYPE is_closure_1(BIF_ALIST_1)
+{
+
+    if (is_any_fun(BIF_ARG_1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(BIF_ARG_1);
+        if (!is_external_fun(funp) ) {
+	       BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+BIF_RETTYPE is_closure_2(BIF_ALIST_2)
+{
+
+    BIF_RET(erl_is_closure2(BIF_P, BIF_ARG_1, BIF_ARG_2));
+}
+
+Eterm erl_is_closure1(Eterm arg1)
+{
+
+    if (is_any_fun(arg1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+        if (!is_external_fun(funp)) {
+            BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+Eterm erl_is_closure2(Process* p, Eterm arg1, Eterm arg2)
+{
+    Sint arity;
+
+    /*
+     * Verify argument 2 (arity); arity must be >= 0.
+     */
+    if (is_small(arg2)) {
+	arity = signed_val(arg2);
+	if (arity < 0) {
+	error:
+	    BIF_ERROR(p, BADARG);
+	}
+    } else if (is_big(arg2) && !bignum_header_is_neg(*big_val(arg2))) {
+	/* A positive bignum is OK, but can't possibly match. */
+	arity = -1;
+    } else {
+	/* Everything else (including negative bignum) is an error. */
+	goto error;
+    }
+
+    if (is_any_fun(arg1)) {
+	ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+
+        if (!is_external_fun(funp) && fun_arity(funp) == (Uint) arity) {
+            BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+BIF_RETTYPE is_export_1(BIF_ALIST_1)
+{
+
+    if (is_any_fun(BIF_ARG_1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(BIF_ARG_1);
+        if (is_external_fun(funp) ) {
+	       BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+BIF_RETTYPE is_export_2(BIF_ALIST_2)
+{
+
+    BIF_RET(erl_is_export2(BIF_P, BIF_ARG_1, BIF_ARG_2));
+}
+
+Eterm erl_is_export1(Eterm arg1)
+{
+
+    if (is_any_fun(arg1)) {
+        ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+        if (is_external_fun(funp)) {
+            BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
+Eterm erl_is_export2(Process* p, Eterm arg1, Eterm arg2)
+{
+    Sint arity;
+
+    /*
+     * Verify argument 2 (arity); arity must be >= 0.
+     */
+    if (is_small(arg2)) {
+	arity = signed_val(arg2);
+	if (arity < 0) {
+	error:
+	    BIF_ERROR(p, BADARG);
+	}
+    } else if (is_big(arg2) && !bignum_header_is_neg(*big_val(arg2))) {
+	/* A positive bignum is OK, but can't possibly match. */
+	arity = -1;
+    } else {
+	/* Everything else (including negative bignum) is an error. */
+	goto error;
+    }
+
+    if (is_any_fun(arg1)) {
+	ErlFunThing* funp = (ErlFunThing *) fun_val(arg1);
+
+        if (is_external_fun(funp) && fun_arity(funp) == (Uint) arity) {
+            BIF_RET(am_true);
+        }
+    }
+
+    BIF_RET(am_false);
+}
+
 BIF_RETTYPE is_boolean_1(BIF_ALIST_1)
 {
     if (BIF_ARG_1 == am_true || BIF_ARG_1 == am_false) {
@@ -271,8 +399,6 @@ BIF_RETTYPE is_boolean_1(BIF_ALIST_1)
 	BIF_RET(am_false);
     }
 }
-
-
 
 /*
  * The compiler usually translates calls to is_record/2 to more primitive

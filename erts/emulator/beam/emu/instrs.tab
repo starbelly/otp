@@ -970,6 +970,42 @@ hot_is_function2(Fail, Fun, Arity) {
     }
 }
 
+is_closure(Fail, Fun) {
+   if (erl_is_closure1($Fun) != am_true) {
+       $FAIL($Fail);
+   }
+}
+
+cold_is_closure2(Fail, Fun, Arity) {
+    if (erl_is_closure2(c_p, $Fun, $Arity) != am_true) {
+        $FAIL($Fail);
+    }
+}
+
+hot_is_closure2(Fail, Fun, Arity) {
+    if (!is_closure2($Fun, $Arity)) {
+        $FAIL($Fail);
+    }
+}
+
+is_export(Fail, Fun) {
+   if (erl_is_export1($Fun) != am_true) {
+       $FAIL($Fail);
+   }
+}
+
+cold_is_export2(Fail, Fun, Arity) {
+    if (erl_is_export2(c_p, $Fun, $Arity) != am_true) {
+        $FAIL($Fail);
+    }
+}
+
+hot_is_export2(Fail, Fun, Arity) {
+    if (!is_export2($Fun, $Arity)) {
+        $FAIL($Fail);
+    }
+}
+
 is_integer(Fail, Src) {
     if (is_not_integer($Src)) {
         $FAIL($Fail);
